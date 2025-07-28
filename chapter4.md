@@ -149,6 +149,54 @@ $$\Delta T = P_{dissipated} \times R_{th}$$
 
 这通常需要主动散热（风扇或液冷）。
 
+#### 热阻链分析
+
+实际散热系统由多个热阻串联组成：
+$$R_{th-total} = R_{th-jc} + R_{th-cs} + R_{th-sa}$$
+
+其中：
+- $R_{th-jc}$ = 芯片到封装热阻（Junction to Case）
+- $R_{th-cs}$ = 封装到散热器热阻（Case to Sink）
+- $R_{th-sa}$ = 散热器到环境热阻（Sink to Ambient）
+
+**典型热阻值**：
+- TO-220封装：$R_{th-jc} ≈ 1-2°C/W$
+- 导热硅脂：$R_{th-cs} ≈ 0.1-0.5°C/W$（取决于厚度和面积）
+- 散热器：$R_{th-sa} ≈ 0.5-10°C/W$（取决于尺寸和风速）
+
+**计算实例4.1：** 细化上例的散热设计，选择具体组件。
+
+解：
+- 总热阻要求：$R_{th-total} = 1.33°C/W$
+- TO-220封装：$R_{th-jc} = 1.5°C/W$（已超标！）
+- 需要选择更好的封装，如TO-3P：$R_{th-jc} = 0.5°C/W$
+- 导热硅脂（薄层）：$R_{th-cs} = 0.2°C/W$
+- 散热器要求：$R_{th-sa} = 1.33 - 0.5 - 0.2 = 0.63°C/W$
+- 选择150×100×50mm铝制散热器+5m/s风速
+
+#### 瞬态热分析
+
+脉冲激光器的瞬态热特性同样重要：
+
+**热时间常数**：
+$$\tau_{thermal} = R_{th} \times C_{th}$$
+
+其中$C_{th}$是热容（J/°C）。
+
+**脉冲工作温升**：
+$$\Delta T_{pulse} = P_{peak} \times R_{th} \times (1 - e^{-t_{pulse}/\tau_{thermal}})$$
+
+对于短脉冲（$t_{pulse} << \tau_{thermal}$）：
+$$\Delta T_{pulse} ≈ P_{peak} \times t_{pulse} / C_{th}$$
+
+**计算实例4.2：** 激光器峰值功率1kW，脉宽100ns，重复频率10kHz。芯片热容0.1J/°C，计算瞬态温升。
+
+解：
+- 单脉冲能量：$E = 1000W \times 100 \times 10^{-9}s = 100μJ$
+- 瞬态温升：$\Delta T_{pulse} = 100 \times 10^{-6}J / 0.1J/°C = 1mK$（可忽略）
+- 平均功率：$P_{avg} = 100μJ \times 10kHz = 1W$
+- 稳态温升更重要：需要考虑1W的连续散热
+
 ### 4.1.6 激光器驱动电路设计
 
 脉冲激光器需要高速、大电流驱动电路。关键设计要素包括：
@@ -178,6 +226,122 @@ $$t_r < 0.1 \times \tau_{pulse}$$
 - 电感限制：$L < V \times t_r / I = 2.5V \times 1ns / 20A = 0.125nH$
 
 这种极低电感要求需要采用芯片级封装和微带线设计。
+
+#### 储能电容设计
+
+脉冲能量来自储能电容，其设计需考虑：
+
+**电容值计算**：
+$$C = \frac{2E_{pulse}}{V_{supply}^2 - V_{min}^2}$$
+
+其中：
+- $E_{pulse}$ = 单脉冲能量
+- $V_{supply}$ = 电源电压
+- $V_{min}$ = 最低工作电压
+
+**电压跌落**：
+$$\Delta V = \frac{I_{pulse} \times t_{pulse}}{C}$$
+
+**计算实例5.1：** 上例中，电源电压48V，允许跌落5V，计算所需电容。
+
+解：
+- 单脉冲能量：$E = 50W \times 10ns = 500nJ$
+- 最低电压：$V_{min} = 48V - 5V = 43V$
+- 所需电容：$C = \frac{2 \times 500 \times 10^{-9}}{48^2 - 43^2} = \frac{10^{-6}}{2304 - 1849} = 2.2nF$
+- 验证跌落：$\Delta V = \frac{20A \times 10ns}{2.2nF} = 91V$（不合理！）
+- 实际需要更大电容：$C = \frac{20A \times 10ns}{5V} = 40nF$
+
+#### 开关器件选择
+
+**GaN FET优势**：
+- 低导通电阻：$R_{DS(on)} < 50mΩ$
+- 高开关速度：$t_{rise} < 1ns$
+- 低输出电容：$C_{oss} < 100pF$
+
+**功率损耗分析**：
+$$P_{loss} = P_{conduction} + P_{switching}$$
+
+导通损耗：
+$$P_{conduction} = I_{RMS}^2 \times R_{DS(on)}$$
+
+开关损耗：
+$$P_{switching} = \frac{1}{2} \times V_{DS} \times I_{D} \times (t_{rise} + t_{fall}) \times f_{rep}$$
+
+**计算实例5.2：** 评估GaN FET在上述应用中的损耗（100kHz重复频率）。
+
+解：
+- RMS电流：$I_{RMS} = I_{pulse} \times \sqrt{D} = 20A \times \sqrt{10ns \times 100kHz} = 0.63A$
+- 导通损耗：$P_{conduction} = 0.63^2 \times 0.05 = 20mW$
+- 开关损耗：$P_{switching} = 0.5 \times 48V \times 20A \times 2ns \times 100kHz = 96mW$
+- 总损耗：$P_{loss} = 116mW$（可接受）
+
+#### PCB布局关键点
+
+**微带线设计**：
+特征阻抗：
+$$Z_0 = \frac{87}{\sqrt{\varepsilon_r + 1.41}} \times \ln\left(\frac{5.98h}{0.8w + t}\right)$$
+
+其中：
+- $\varepsilon_r$ = 介电常数（FR4: 4.4）
+- $h$ = 介质厚度
+- $w$ = 导线宽度
+- $t$ = 铜箔厚度
+
+**寄生电感估算**：
+$$L_{trace} ≈ 0.2nH/mm \times length$$
+
+**计算实例5.3：** 设计50Ω微带线，FR4板材，介质厚度0.2mm。
+
+解：
+- 使用简化公式：$w/h ≈ 2$（对于50Ω，εr=4.4）
+- 导线宽度：$w = 2 \times 0.2mm = 0.4mm$
+- 若走线长度10mm：$L_{trace} = 0.2nH/mm \times 10mm = 2nH$
+- 这已经超过允许的0.125nH！需要：
+  - 缩短走线至<1mm
+  - 使用多层并联
+  - 芯片直接键合
+
+### 4.1.7 激光器可靠性与寿命
+
+#### 失效机制
+
+**突发失效（COD - Catastrophic Optical Damage）**：
+- 发生条件：光功率密度超过阈值（~10MW/cm²）
+- 表现：输出腔面烧毁
+- 预防：腔面钝化涂层
+
+**渐进退化**：
+- 暗线生长
+- 欧姆接触退化
+- 腔面氧化
+
+**寿命模型（Arrhenius）**：
+$$MTTF = A \times exp\left(\frac{E_a}{k_B T}\right) \times I^{-n}$$
+
+其中：
+- $E_a$ = 激活能（典型0.3-0.7eV）
+- $n$ = 电流加速因子（典型2-3）
+
+**计算实例6：** 激光器在25°C、额定电流下MTTF=100,000小时。计算85°C、1.2倍额定电流下的寿命。假设Ea=0.5eV，n=2.5。
+
+解：
+- 温度因子：$exp\left(\frac{0.5eV}{8.617 \times 10^{-5}eV/K} \times \left(\frac{1}{298} - \frac{1}{358}\right)\right) = exp(3.4) = 30$
+- 电流因子：$1.2^{-2.5} = 0.57$
+- 新MTTF：$100,000h \times \frac{1}{30} \times 0.57 = 1,900h$
+- 寿命缩短50倍以上！
+
+#### 冗余设计
+
+**N+1冗余**：
+系统可靠性：
+$$R_{system} = 1 - (1-R_{laser})^{N+1}$$
+
+**计算实例6.1：** 单激光器5年可靠性90%，计算2+1冗余系统的可靠性。
+
+解：
+- 单器件失效率：$1 - 0.9 = 0.1$
+- 系统失效率：$(0.1)^3 = 0.001$
+- 系统可靠性：$1 - 0.001 = 99.9\%$
 
 ## 4.2 探测器技术
 

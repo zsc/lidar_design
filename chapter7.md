@@ -4,7 +4,7 @@
 
 ## 7.1 暗场景性能
 
-激光雷达的主动探测原理使其在完全黑暗的环境中仍能正常工作，这是相机等被动传感器无法比拟的优势。
+激光雷达的主动探测原理使其在完全黑暗的环境中仍能正常工作，这是相机等被动传感器无法比拟的优势。这种能力使激光雷达成为夜间自动驾驶、地下探测和深空探测等应用的理想选择。
 
 ### 7.1.1 最小可探测功率
 
@@ -16,11 +16,26 @@ $$P_{min} = NEP \cdot \sqrt{B}$$
 - NEP：噪声等效功率密度 [W/√Hz]
 - B：探测器带宽 [Hz]
 
+NEP的物理来源包括：
+1. **热噪声（Johnson-Nyquist噪声）**：
+   $$NEP_{thermal} = \sqrt{\frac{4kT}{R}}$$
+   
+2. **散粒噪声**：
+   $$NEP_{shot} = \sqrt{2q(I_{dark} + I_{bg})\cdot R}$$
+   
+3. **1/f噪声**（低频段主导）：
+   $$NEP_{1/f} \propto \frac{1}{\sqrt{f}}$$
+
+总NEP为各噪声源的平方和根：
+$$NEP_{total} = \sqrt{NEP_{thermal}^2 + NEP_{shot}^2 + NEP_{1/f}^2}$$
+
 **计算实例1：APD探测器灵敏度**
 
 典型Si-APD在905nm波长下的参数：
 - NEP = 1×10⁻¹⁴ W/√Hz
 - 带宽 B = 100 MHz = 10⁸ Hz
+- 增益 M = 100
+- 暗电流 I_dark = 1 nA
 
 最小可探测功率：
 $$P_{min} = 1 \times 10^{-14} \times \sqrt{10^8} = 1 \times 10^{-14} \times 10^4 = 1 \times 10^{-10} \text{ W} = 0.1 \text{ nW}$$
@@ -28,38 +43,88 @@ $$P_{min} = 1 \times 10^{-14} \times \sqrt{10^8} = 1 \times 10^{-14} \times 10^4
 对应的最小可探测光子数：
 $$N_{photons} = \frac{P_{min} \cdot t_{pulse}}{h\nu} = \frac{10^{-10} \times 10^{-8}}{2.19 \times 10^{-19}} \approx 4.6 \text{ 光子}$$
 
+**增益优化分析**
+
+APD的最优增益需要平衡信号放大和噪声增加：
+$$SNR = \frac{M \cdot P_{signal}}{NEP_{total}(M) \cdot \sqrt{B}}$$
+
+其中NEP随增益变化：
+$$NEP(M) = NEP_0 \cdot \sqrt{1 + F(M-1)}$$
+
+F是过剩噪声因子，对于Si-APD，F ≈ 0.3-0.5。
+
+**计算实例1.1：不同探测器技术比较**
+
+| 探测器类型 | NEP [W/√Hz] | 量子效率 | 增益 | 最小光子数 |
+|-----------|-------------|---------|------|-----------|
+| PIN二极管 | 10⁻¹³ | 0.8 | 1 | 46 |
+| APD | 10⁻¹⁴ | 0.7 | 100 | 5 |
+| SPAD | 10⁻¹⁵ | 0.5 | 10⁶ | <1 |
+| SiPM | 10⁻¹⁵ | 0.4 | 10⁶ | <1 |
+
 ### 7.1.2 环境光抑制
 
-激光雷达通过多种技术抑制环境光干扰：
+激光雷达通过多种技术抑制环境光干扰，实现在强光环境下的可靠探测：
 
 1. **窄带滤光片**
    
+   滤光片的光谱透过率可用洛伦兹函数描述：
+   $$T(\lambda) = \frac{T_{max}}{1 + \left(\frac{\lambda - \lambda_0}{\Delta\lambda/2}\right)^2}$$
+   
    滤光片带宽与环境光抑制比的关系：
-   $$R_{suppression} = \frac{\lambda_{total}}{\Delta\lambda_{filter}}$$
+   $$R_{suppression} = \frac{\lambda_{total}}{\Delta\lambda_{filter} \cdot \sqrt{T_{max}}}$$
    
    典型参数：
    - 太阳光谱范围：400-2500 nm
-   - 滤光片带宽：1-3 nm @ 905nm
+   - 滤光片中心波长：λ₀ = 905 nm
+   - 滤光片FWHM：Δλ = 2 nm
+   - 峰值透过率：T_max = 0.9
    
    抑制比：
-   $$R_{suppression} = \frac{2100}{2} = 1050 \approx 10^3$$
+   $$R_{suppression} = \frac{2100}{2 \times \sqrt{0.9}} = \frac{2100}{1.897} = 1107$$
+   
+   **多层介质滤光片设计**
+   
+   使用1/4波长堆栈：
+   $$R = \left|\frac{n_0 - n_s(n_H/n_L)^{2N}}{n_0 + n_s(n_H/n_L)^{2N}}\right|^2$$
+   
+   其中N是层对数，n_H和n_L分别是高低折射率材料。
 
 2. **时间门控**
    
-   时间门控进一步抑制非同步环境光：
-   $$R_{time} = \frac{T_{total}}{T_{gate}}$$
+   时间门控通过精确控制探测器开启时间窗口抑制非同步环境光：
+   $$R_{time} = \frac{T_{total}}{T_{gate} \cdot D_{cycle}}$$
+   
+   其中D_cycle是占空比。
    
    典型参数：
    - 测量周期：T_total = 1 ms
    - 门控时间：T_gate = 1 μs
+   - 占空比：D_cycle = 0.1%
    
    时间抑制比：
-   $$R_{time} = \frac{10^{-3}}{10^{-6}} = 10^3$$
+   $$R_{time} = \frac{10^{-3}}{10^{-6} \times 0.001} = 10^6$$
 
-3. **总抑制比**
+3. **空间滤波**
+   
+   通过限制接收视场角（FOV）减少环境光：
+   $$R_{spatial} = \frac{4\pi}{\Omega_{FOV}} = \frac{4\pi}{\pi\theta_{FOV}^2}$$
+   
+   典型FOV = 0.1°：
+   $$R_{spatial} = \frac{4}{(0.1 \times \pi/180)^2} = 1.32 \times 10^6$$
+
+4. **偏振滤波**
+   
+   利用大气散射的偏振特性：
+   $$R_{pol} = \frac{1}{1 - P_{sky}}$$
+   
+   其中P_sky是天空光的偏振度，典型值0.3-0.7。
+
+5. **总抑制比**
    
    综合抑制比为各技术的乘积：
-   $$R_{total} = R_{suppression} \times R_{time} \times R_{spatial} > 10^6$$
+   $$R_{total} = R_{suppression} \times R_{time} \times R_{spatial} \times R_{pol}$$
+   $$R_{total} = 1107 \times 10^6 \times 1.32 \times 10^6 \times 2 > 10^{15}$$
 
 **计算实例2：强阳光下的信噪比**
 
@@ -85,101 +150,380 @@ $$P_{ambient,gated} = P_{ambient} \times \frac{T_{gate}}{T_{total}} = 4.67 \time
 
 ### 7.1.3 夜视能力对比
 
-激光雷达vs夜视相机性能对比：
+激光雷达vs其他夜视技术的定量比较：
 
-| 参数 | 激光雷达 | 夜视相机(Gen 3) |
-|------|----------|----------------|
-| 最低照度要求 | 0 lux | >0.0001 lux |
-| 测距能力 | 有，精度mm级 | 无 |
-| 受月光影响 | 无 | 显著 |
-| 阴影区域性能 | 正常 | 严重退化 |
+| 参数 | 激光雷达 | 夜视相机(Gen 3) | 热成像(LWIR) | 毫米波雷达 |
+|------|----------|----------------|--------------|------------|
+| 最低照度要求 | 0 lux | >0.0001 lux | 0 lux | 0 lux |
+| 测距能力 | 有，精度1-3mm | 无 | 无 | 有，精度0.1-1m |
+| 角分辨率 | 0.1-0.3° | 0.01° | 0.5-1° | 1-3° |
+| 受天气影响 | 中等 | 轻微 | 严重(雾) | 轻微 |
+| 成本 | $500-5000 | $3000-10000 | $5000-20000 | $100-1000 |
+| 功耗 | 10-30W | 5-10W | 2-5W | 10-20W |
+
+**夜间探测性能定量分析**
+
+1. **激光雷达信噪比**（0 lux环境）：
+   $$SNR_{LiDAR} = \frac{P_{laser}}{P_{noise}} = \frac{P_t \cdot \rho \cdot A_r \cdot \eta}{NEP \cdot \sqrt{B} \cdot \pi R^2}$$
+   
+   100m处，ρ=0.1：SNR ≈ 40 dB
+
+2. **夜视相机信噪比**（星光0.001 lux）：
+   $$SNR_{NV} = \frac{N_{photon} \cdot QE \cdot G}{N_{noise}}$$
+   
+   其中：
+   - N_photon = 照度×像素面积×积分时间/光子能量
+   - G = 像增强器增益（~10⁴）
+   
+   典型条件下：SNR ≈ 20 dB
+
+3. **热成像信噪比**（温差ΔT）：
+   $$NETD = \frac{4F^2\sqrt{B}}{A_d D^* \frac{\partial M}{\partial T}}$$
+   
+   其中NETD是噪声等效温差，典型值50-100 mK。
+
+**计算实例7.1：不同距离下的探测概率**
+
+使用检测理论，探测概率P_d与虚警概率P_fa的关系：
+$$P_d = Q\left(Q^{-1}(P_{fa}) - \sqrt{SNR}\right)$$
+
+其中Q是标准正态分布的互补累积分布函数。
+
+设定P_fa = 10⁻⁶，计算不同距离下的探测概率：
+
+| 距离[m] | 激光雷达P_d | 夜视相机P_d | 热成像P_d(ΔT=1K) |
+|---------|------------|-------------|------------------|
+| 50 | >0.9999 | 0.95 | 0.98 |
+| 100 | 0.9999 | 0.80 | 0.90 |
+| 200 | 0.99 | 0.50 | 0.70 |
+| 500 | 0.90 | <0.1 | 0.40 |
+
+### 7.1.4 极端暗环境应用
+
+**地下/隧道环境**
+
+在完全无光的地下环境，激光雷达展现独特优势：
+
+1. **矿井安全监测**
+   - 甲烷浓度不影响905nm激光传播
+   - 粉尘环境下的穿透能力分析：
+   $$\tau_{dust} = \exp(-\alpha_{ext} \cdot C_{dust} \cdot L)$$
+   
+   其中α_ext是消光系数，C_dust是粉尘浓度。
+
+2. **隧道施工导航**
+   - 无需照明设备，降低能耗
+   - 可检测<1mm的结构变形
+
+**深空探测应用**
+
+月球/火星探测车的激光雷达设计考虑：
+- 无大气散射，激光传输效率接近100%
+- 极端温度（-173°C到127°C）下的波长漂移：
+  $$\Delta\lambda = \frac{\partial\lambda}{\partial T} \cdot \Delta T \approx 0.3 \text{ nm/K} \times 300 \text{ K} = 90 \text{ nm}$$
+  
+需要相应调整滤光片带宽。
 
 ## 7.2 测距精度分析
 
-激光雷达的测距精度是其最重要的性能指标之一，理解精度极限对系统设计至关重要。
+激光雷达的测距精度是其最重要的性能指标之一，理解精度极限对系统设计至关重要。本节将从信息论角度深入分析测距精度的理论极限，并探讨实际系统中的各种误差源。
 
 ### 7.2.1 理论精度极限
 
-基于克拉美-罗下界（Cramér-Rao Lower Bound），时间测量的理论精度极限为：
+**克拉美-罗下界（CRLB）推导**
 
-$$\sigma_{t,min} = \frac{1}{2\sqrt{2}\pi B \cdot \sqrt{SNR}}$$
+对于参数估计问题，CRLB给出了无偏估计量方差的下界。对于激光雷达时间测量：
+
+$$\sigma_{t}^2 \geq \frac{1}{I(\tau)}$$
+
+其中I(τ)是Fisher信息量：
+$$I(\tau) = E\left[\left(\frac{\partial \ln L}{\partial \tau}\right)^2\right]$$
+
+对于高斯白噪声中的脉冲信号：
+$$s(t) = A \cdot p(t-\tau) + n(t)$$
+
+其中p(t)是归一化脉冲波形，n(t)是噪声。
+
+经过推导，时间测量的理论精度极限为：
+
+$$\sigma_{t,min} = \frac{1}{2\sqrt{2}\pi B_{eff} \cdot \sqrt{SNR}}$$
+
+其中有效带宽定义为：
+$$B_{eff} = \frac{\left[\int_{-\infty}^{\infty} f^2|P(f)|^2 df\right]^{1/2}}{\int_{-\infty}^{\infty} |P(f)|^2 df}$$
 
 对应的距离测量精度：
 
-$$\sigma_{d,min} = \frac{c}{2} \cdot \sigma_{t,min} = \frac{c}{4\sqrt{2}\pi B \cdot \sqrt{SNR}}$$
+$$\sigma_{d,min} = \frac{c}{2} \cdot \sigma_{t,min} = \frac{c}{4\sqrt{2}\pi B_{eff} \cdot \sqrt{SNR}}$$
 
-其中：
-- c：光速（3×10⁸ m/s）
-- B：信号带宽 [Hz]
-- SNR：信噪比
+**脉冲波形对精度的影响**
+
+不同脉冲波形具有不同的有效带宽：
+
+1. **矩形脉冲**：
+   $$p(t) = \frac{1}{\tau_p} \text{ rect}\left(\frac{t}{\tau_p}\right)$$
+   $$B_{eff} = \frac{0.886}{\tau_p}$$
+
+2. **高斯脉冲**：
+   $$p(t) = \frac{1}{\sigma_p\sqrt{2\pi}} \exp\left(-\frac{t^2}{2\sigma_p^2}\right)$$
+   $$B_{eff} = \frac{1}{2\sqrt{2}\pi\sigma_p}$$
+
+3. **升余弦脉冲**：
+   $$p(t) = \frac{\pi}{2\tau_p} \cos\left(\frac{\pi t}{2\tau_p}\right) \text{ rect}\left(\frac{t}{2\tau_p}\right)$$
+   $$B_{eff} = \frac{1.22}{\tau_p}$$
 
 **计算实例3：不同条件下的精度极限**
 
-条件1：高性能系统
-- 带宽 B = 1 GHz
+条件1：高性能FMCW系统
+- 调制带宽 B = 2 GHz
 - SNR = 100 (20 dB)
+- 高斯脉冲，σ_p = 0.5 ns
 
-$$\sigma_{d,min} = \frac{3 \times 10^8}{4\sqrt{2} \times 3.14159 \times 10^9 \times \sqrt{100}}$$
-$$\sigma_{d,min} = \frac{3 \times 10^8}{4 \times 1.414 \times 3.14159 \times 10^9 \times 10}$$
-$$\sigma_{d,min} = \frac{3 \times 10^8}{1.78 \times 10^{11}} = 1.69 \times 10^{-3} \text{ m} = 1.69 \text{ mm}$$
+有效带宽：
+$$B_{eff} = \frac{1}{2\sqrt{2}\pi \times 0.5 \times 10^{-9}} = 225 \text{ MHz}$$
 
-条件2：标准系统
-- 带宽 B = 100 MHz  
-- SNR = 50
+测距精度：
+$$\sigma_{d,min} = \frac{3 \times 10^8}{4\sqrt{2} \times 3.14159 \times 2.25 \times 10^8 \times \sqrt{100}}$$
+$$\sigma_{d,min} = \frac{3 \times 10^8}{4 \times 1.414 \times 3.14159 \times 2.25 \times 10^9} = 0.75 \text{ mm}$$
 
-$$\sigma_{d,min} = \frac{3 \times 10^8}{4\sqrt{2} \times 3.14159 \times 10^8 \times \sqrt{50}}$$
-$$\sigma_{d,min} = \frac{3 \times 10^8}{1.78 \times 10^{10} \times 7.07} = 2.39 \text{ mm}$$
+条件2：标准ToF系统
+- 脉冲宽度 τ_p = 10 ns (矩形)
+- SNR = 50 (17 dB)
+
+有效带宽：
+$$B_{eff} = \frac{0.886}{10 \times 10^{-9}} = 88.6 \text{ MHz}$$
+
+测距精度：
+$$\sigma_{d,min} = \frac{3 \times 10^8}{4\sqrt{2} \times 3.14159 \times 8.86 \times 10^7 \times \sqrt{50}} = 2.70 \text{ mm}$$
+
+**量子极限**
+
+当信号极弱时，需考虑光子统计特性。对于泊松分布的光子计数：
+$$\sigma_{t,quantum} = \frac{\tau_p}{\sqrt{N_{photon}}}$$
+
+其中N_photon是探测到的光子数。
+
+量子极限下的测距精度：
+$$\sigma_{d,quantum} = \frac{c \cdot \tau_p}{2\sqrt{N_{photon}}}$$
+
+**计算实例3.1：单光子探测精度**
+
+- 脉冲宽度：τ_p = 1 ns
+- 平均光子数：N_photon = 10
+
+$$\sigma_{d,quantum} = \frac{3 \times 10^8 \times 10^{-9}}{2\sqrt{10}} = 47.4 \text{ mm}$$
+
+这解释了为什么单光子激光雷达通常需要多次测量取平均。
 
 ### 7.2.2 实际精度影响因素
 
-实际系统的测距精度受多个因素影响：
+实际系统的测距精度受多个因素影响，需要建立完整的误差模型：
 
-$$\sigma_{d,total} = \sqrt{\sigma_{d,min}^2 + \sigma_{d,timing}^2 + \sigma_{d,walk}^2 + \sigma_{d,cal}^2}$$
+$$\sigma_{d,total} = \sqrt{\sigma_{d,min}^2 + \sigma_{d,timing}^2 + \sigma_{d,walk}^2 + \sigma_{d,cal}^2 + \sigma_{d,drift}^2 + \sigma_{d,atm}^2}$$
 
-1. **时钟抖动误差**
-   
-   $$\sigma_{d,timing} = \frac{c \cdot \sigma_{clock}}{2}$$
-   
-   典型时钟抖动：σ_clock = 10 ps
-   $$\sigma_{d,timing} = \frac{3 \times 10^8 \times 10 \times 10^{-12}}{2} = 1.5 \text{ mm}$$
+#### 1. **时钟抖动误差**
 
-2. **脉冲走动误差（Walk Error）**
-   
-   由于信号幅度变化导致的触发时刻偏移：
-   $$\sigma_{d,walk} \approx \frac{c \cdot \tau_{rise}}{2 \cdot \sqrt{SNR}}$$
-   
-   上升时间 τ_rise = 1 ns，SNR = 50：
-   $$\sigma_{d,walk} = \frac{3 \times 10^8 \times 10^{-9}}{2 \times 7.07} = 21.2 \text{ mm}$$
+时钟抖动包括确定性抖动（DJ）和随机抖动（RJ）：
+$$\sigma_{clock,total} = \sqrt{\sigma_{DJ}^2 + \sigma_{RJ}^2}$$
 
-3. **标定残差**
-   
-   $$\sigma_{d,cal} \approx 0.1\% \times d$$
-   
-   在100m距离处：σ_d,cal = 100 mm
+其中：
+- 确定性抖动：周期性干扰、电源噪声等
+- 随机抖动：热噪声、相位噪声等
 
-**计算实例4：100m处的总测距精度**
+$$\sigma_{d,timing} = \frac{c \cdot \sigma_{clock,total}}{2}$$
 
-综合各项误差：
-$$\sigma_{d,total} = \sqrt{2.39^2 + 1.5^2 + 21.2^2 + 100^2}$$
-$$\sigma_{d,total} = \sqrt{5.71 + 2.25 + 449.44 + 10000} = \sqrt{10457.4} = 102.3 \text{ mm}$$
+**高精度时钟设计**
 
-可见在远距离处，标定误差成为主导因素。
+使用温度补偿晶振（TCXO）或恒温晶振（OCXO）：
+
+| 时钟类型 | 频率稳定度 | 相位噪声@1kHz | 时间抖动 | 测距误差 |
+|---------|-----------|---------------|---------|----------|
+| 普通晶振 | ±50 ppm | -120 dBc/Hz | 100 ps | 15 mm |
+| TCXO | ±1 ppm | -140 dBc/Hz | 10 ps | 1.5 mm |
+| OCXO | ±0.01 ppm | -160 dBc/Hz | 1 ps | 0.15 mm |
+| 原子钟 | ±10⁻¹² | -170 dBc/Hz | 0.1 ps | 0.015 mm |
+
+#### 2. **脉冲走动误差（Walk Error）**
+
+走动误差是由于触发阈值固定而信号幅度变化造成的：
+
+**恒比定时（CFD）补偿**
+
+使用恒比定时可显著降低走动误差：
+$$t_{CFD} = t_{threshold} + \frac{V_{th} - f \cdot V_{peak}}{dV/dt|_{t=t_{CFD}}}$$
+
+其中f是恒比系数（典型0.3-0.5）。
+
+CFD后的走动误差：
+$$\sigma_{d,walk,CFD} \approx \frac{c \cdot \tau_{rise}}{2 \cdot SNR} \cdot \frac{1-f}{f}$$
+
+**计算实例4.1：CFD效果分析**
+
+- 上升时间：τ_rise = 1 ns
+- SNR = 50
+- 恒比系数：f = 0.3
+
+无CFD：
+$$\sigma_{d,walk} = \frac{3 \times 10^8 \times 10^{-9}}{2 \times 7.07} = 21.2 \text{ mm}$$
+
+有CFD：
+$$\sigma_{d,walk,CFD} = 21.2 \times \frac{0.7}{0.3} = 49.5 \text{ mm}$$
+
+注意：虽然看起来更差，但CFD主要优势在于消除系统性偏差。
+
+#### 3. **温度漂移误差**
+
+温度变化影响电路延迟和光学路径：
+$$\sigma_{d,drift} = \alpha_{temp} \cdot \Delta T \cdot d$$
+
+其中α_temp是温度系数，典型值1-5 ppm/°C。
+
+**温度补偿模型**
+
+建立多项式补偿模型：
+$$d_{corrected} = d_{measured} \cdot [1 + \sum_{i=1}^{n} a_i(T-T_0)^i]$$
+
+#### 4. **大气折射误差**
+
+大气折射率随温度、压力、湿度变化：
+$$n_{air} = 1 + \frac{0.000293}{1 + 0.00367T} \cdot \frac{P}{1013.25}$$
+
+折射率变化导致的测距误差：
+$$\Delta d = d \cdot (n_{air} - 1)$$
+
+**计算实例4.2：环境条件影响**
+
+标准条件（20°C, 1013.25 hPa）到极端条件（40°C, 950 hPa）：
+$$\Delta n = 0.000293 \times \left(\frac{1}{1.0734} \times \frac{950}{1013.25} - 1\right) = -3.7 \times 10^{-5}$$
+
+100m距离的误差：
+$$\Delta d = 100 \times 3.7 \times 10^{-5} = 3.7 \text{ mm}$$
+
+#### 5. **多路径误差**
+
+当激光经多次反射到达目标时产生：
+$$P_{multipath}(t) = \sum_{i} A_i \cdot p(t - \tau_i)$$
+
+**多路径检测算法**
+
+1. 波形分析：检测多峰
+2. 偏振分析：多路径通常去偏振
+3. 相位一致性检查（FMCW系统）
+
+**综合误差预算**
+
+建立完整的误差预算表：
+
+| 误差源 | 近距离(10m) | 中距离(50m) | 远距离(200m) | 缓解措施 |
+|--------|------------|-------------|--------------|----------|
+| 理论极限 | 2.4 mm | 2.4 mm | 2.4 mm | 提高SNR/带宽 |
+| 时钟抖动 | 1.5 mm | 1.5 mm | 1.5 mm | 高稳定度时钟 |
+| 走动误差 | 21.2 mm | 4.2 mm | 1.1 mm | CFD/数字处理 |
+| 标定误差 | 10 mm | 50 mm | 200 mm | 精确标定 |
+| 温度漂移 | 1 mm | 5 mm | 20 mm | 温度补偿 |
+| 大气折射 | 0.4 mm | 1.9 mm | 7.4 mm | 环境补偿 |
+| **总误差** | **24.5 mm** | **51.7 mm** | **201.1 mm** | - |
 
 ### 7.2.3 精度vs距离关系
 
-测距精度随距离的变化关系：
+测距精度随距离的变化呈现复杂的非线性关系，需要考虑多个物理机制：
 
-$$\sigma_d(R) = \sqrt{\sigma_{d,0}^2 + (k_1 \cdot R)^2 + \frac{k_2^2}{SNR(R)}}$$
+**综合精度模型**
 
-其中SNR随距离衰减：
-$$SNR(R) = SNR_0 \cdot \left(\frac{R_0}{R}\right)^2$$
+$$\sigma_d(R) = \sqrt{\sigma_{d,0}^2 + (k_1 \cdot R)^2 + \frac{k_2^2}{SNR(R)} + \sigma_{atm}^2(R) + \sigma_{divergence}^2(R)}$$
 
-典型参数：
-- σ_d,0 = 2 mm（固定误差）
-- k_1 = 0.001（1‰相对误差）
-- k_2 = 100 mm（SNR相关误差系数）
-- R_0 = 10 m（参考距离）
-- SNR_0 = 1000（参考SNR）
+其中各项的物理意义：
+1. σ_d,0：与距离无关的固定误差（时钟、电路噪声等）
+2. k₁·R：比例误差（标定、温度漂移等）
+3. k₂²/SNR(R)：信噪比相关误差
+4. σ_atm(R)：大气传播误差
+5. σ_divergence(R)：光束发散引起的误差
+
+**SNR距离依赖模型**
+
+考虑大气衰减的激光雷达方程：
+$$SNR(R) = \frac{P_t \cdot \rho \cdot A_r \cdot \eta_{sys}}{NEP \cdot \sqrt{B} \cdot \pi R^2} \cdot \exp(-2\alpha R)$$
+
+其中α是大气消光系数，典型值：
+- 晴天：α = 0.1-0.2 km⁻¹
+- 轻雾：α = 1-2 km⁻¹  
+- 浓雾：α = 10-20 km⁻¹
+
+**光束发散影响**
+
+激光光束发散导致的目标覆盖误差：
+$$\sigma_{divergence}(R) = \frac{R \cdot \theta_{div}}{2\sqrt{12}}$$
+
+其中θ_div是光束发散角（全角）。
+
+**计算实例5：不同条件下的精度-距离曲线**
+
+系统参数：
+- σ_d,0 = 2 mm
+- k₁ = 0.001 (0.1%)
+- k₂ = 100 mm
+- SNR₀ = 1000 @ R₀ = 10m
+- θ_div = 0.3 mrad
+- α = 0.15 km⁻¹（晴天）
+
+距离10m处：
+$$\sigma_d(10) = \sqrt{2^2 + (0.001 \times 10000)^2 + \frac{100^2}{1000} + 0 + \frac{(10 \times 0.0003)^2}{12}}$$
+$$\sigma_d(10) = \sqrt{4 + 100 + 10 + 0 + 0.0075} = 10.7 \text{ mm}$$
+
+距离100m处：
+$$SNR(100) = 1000 \times \left(\frac{10}{100}\right)^2 \times \exp(-2 \times 0.15 \times 0.1) = 9.7$$
+$$\sigma_d(100) = \sqrt{4 + 10000 + \frac{10000}{9.7} + 1 + 0.75} = 107.5 \text{ mm}$$
+
+**精度优化策略**
+
+1. **近距离优化**（<50m）
+   - 重点：降低固定误差和走动误差
+   - 方法：高速时钟、CFD、精确标定
+
+2. **中距离优化**（50-200m）
+   - 重点：提高SNR、减小比例误差
+   - 方法：增大接收孔径、温度补偿
+
+3. **远距离优化**（>200m）
+   - 重点：克服大气影响、提高发射功率
+   - 方法：1550nm波长、自适应光学
+
+**动态范围与精度权衡**
+
+为保证全量程精度，需要动态调整系统参数：
+
+$$G_{optimal}(R) = \sqrt{\frac{NEP^2 \cdot R^2}{P_0 \cdot \rho \cdot A_r}}$$
+
+这确保在不同距离下都能获得最佳SNR。
+
+### 7.2.4 高级测距技术
+
+**1. 相位式测距增强**
+
+结合粗测和精测：
+$$d = \frac{c}{2} \left(\frac{N\cdot T + \Delta\phi/2\pi \cdot T}{1}\right)$$
+
+其中N是整周期数（粗测），Δφ是相位差（精测）。
+
+精度提升：
+$$\sigma_{phase} = \frac{c}{2\pi f_m \sqrt{2SNR}}$$
+
+对于f_m = 100 MHz，SNR = 100：
+$$\sigma_{phase} = \frac{3 \times 10^8}{2\pi \times 10^8 \times \sqrt{200}} = 0.34 \text{ mm}$$
+
+**2. 多频测距**
+
+使用多个调制频率解决模糊性：
+$$d = \frac{c}{2} \cdot \frac{\phi_1/f_1 - \phi_2/f_2}{2\pi(1/f_1 - 1/f_2)}$$
+
+**3. 统计滤波方法**
+
+卡尔曼滤波用于动态目标：
+$$\begin{bmatrix} d_k \\ v_k \end{bmatrix} = \begin{bmatrix} 1 & \Delta t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} d_{k-1} \\ v_{k-1} \end{bmatrix} + w_k$$
+
+测量更新：
+$$z_k = d_k + v_k$$
+
+可将测距精度提升√N倍（N为测量次数）。
 
 ## 7.3 材质无关性
 

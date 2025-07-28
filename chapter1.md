@@ -150,10 +150,10 @@ $P_{bg} = 0.7 \times 3 \times \pi \times 0.0125^2 \times 2.39 \times 10^{-6} = 2
 $$\sigma_{total} = \sqrt{\sigma_{laser}^2 + \sigma_{detector}^2 + \sigma_{circuit}^2}$$
 
 **计算实例9**：各分量分别为30 ps、100 ps、50 ps：
-$$\sigma_{total} = \sqrt{30^2 + 100^2 + 50^2} = \sqrt{900 + 10000 + 2500} = 116$ ps
+$\sigma_{total} = \sqrt{30^2 + 100^2 + 50^2} = \sqrt{900 + 10000 + 2500} = 116$ ps
 
 对应距离精度：
-$$\sigma_d = \frac{c \cdot \sigma_{total}}{2} = \frac{3 \times 10^8 \times 116 \times 10^{-12}}{2} = 17.4$ mm
+$\sigma_d = \frac{c \cdot \sigma_{total}}{2} = \frac{3 \times 10^8 \times 116 \times 10^{-12}}{2} = 17.4$ mm
 
 ### 1.1.10 脉冲编码技术
 
@@ -166,7 +166,7 @@ $$\sigma_d = \frac{c \cdot \sigma_{total}}{2} = \frac{3 \times 10^8 \times 116 \
 $$G = \sqrt{31} = 5.57$$
 
 信噪比改善：
-$$SNR_{improvement} = 10\log_{10}(31/5.57^2) = 10\log_{10}(1) = 0$$ dB
+$SNR_{improvement} = 10\log_{10}(31/5.57^2) = 10\log_{10}(1) = 0$ dB
 
 虽然总SNR不变，但抗干扰能力大幅提升，因为只有相同编码的回波才能通过相关检测。
 
@@ -289,7 +289,7 @@ $$SNR = \frac{2\eta P_s P_{LO}}{h\nu B(1 + 2\eta P_{LO}/i_{sat})}$$
 $$SNR = \frac{2\eta P_s P_{LO}}{h\nu B}$$
 
 **计算实例7**：1550 nm系统，$\eta = 0.8$，$P_s = 1$ nW，$P_{LO} = 1$ mW，$B = 10$ MHz：
-$$h\nu = \frac{6.626 \times 10^{-34} \times 3 \times 10^8}{1550 \times 10^{-9}} = 1.28 \times 10^{-19}$ J
+$h\nu = \frac{6.626 \times 10^{-34} \times 3 \times 10^8}{1550 \times 10^{-9}} = 1.28 \times 10^{-19}$ J
 
 $$SNR = \frac{2 \times 0.8 \times 10^{-9} \times 10^{-3}}{1.28 \times 10^{-19} \times 10^7} = 1250$$
 
@@ -304,7 +304,7 @@ $$f_{ref}(t) = \frac{2L_{ref}}{c} \cdot \frac{df}{dt}$$
 理想情况下$f_{ref}$应为常数。通过重采样使参考信号等间隔，实现非线性校正。
 
 **计算实例8**：$L_{ref} = 10$ m光纤延迟线（折射率1.45），理想扫频率$k = 10^{12}$ Hz/s：
-$$f_{ref,ideal} = \frac{2 \times 10 \times 1.45}{3 \times 10^8} \times 10^{12} = 96.7$ kHz
+$f_{ref,ideal} = \frac{2 \times 10 \times 1.45}{3 \times 10^8} \times 10^{12} = 96.7$ kHz
 
 若实测$f_{ref}$在90-105 kHz间波动，说明瞬时扫频率变化±8%，需要补偿。
 
@@ -315,7 +315,7 @@ FMCW可同时探测多个目标，频率分辨率决定距离分辨能力：
 $$\Delta R_{min} = \frac{c}{2B}$$
 
 动态范围受ADC位数和底噪限制。对于N位ADC：
-$$DR = 6.02N + 1.76 - 10\log_{10}(B/f_s)$ dB
+$DR = 6.02N + 1.76 - 10\log_{10}(B/f_s)$ dB
 
 **计算实例9**：调频带宽$B = 2$ GHz，使用12位ADC，采样率$f_s = 10$ MHz：
 - 距离分辨率：$\Delta R_{min} = 3 \times 10^8/(2 \times 2 \times 10^9) = 0.075$ m
@@ -333,8 +333,8 @@ $$\frac{d\lambda}{dT} \approx 0.1 \text{ nm/°C}$$（典型DFB激光器）
 $$\Delta R = R \cdot \frac{\Delta\lambda}{\lambda}$$
 
 **计算实例10**：100米目标，温度变化10°C，1550 nm激光器：
-$$\Delta\lambda = 0.1 \times 10 = 1$ nm
-$$\Delta R = 100 \times \frac{1}{1550} = 64.5$ mm
+$\Delta\lambda = 0.1 \times 10 = 1$ nm
+$\Delta R = 100 \times \frac{1}{1550} = 64.5$ mm
 
 需要温度控制（TEC）保持mK级稳定性，或使用参考气室进行波长锁定。
 
