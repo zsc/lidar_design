@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>Chapter 8: 点云处理基础算法</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达完整技术教程</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 1: 激光雷达基础原理</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 2: 激光雷达技术发展与主要厂商</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 3: 激光雷达类型与扫描机制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 4: 激光雷达制造技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 5: 信号处理与时序控制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 6: 误差源分析（非信号处理）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 7: 激光雷达独特优势与性能极限</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 8: 点云处理基础算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 9: 高级点云算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 10: 标定技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 11: 多传感器融合算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 12: 自动驾驶专用章节</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 13: 机器人应用（人形与仓储）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 14: 其他应用领域</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达教程项目说明</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="chapter-8">Chapter 8: 点云处理基础算法</h1>
+<p>激光雷达输出的原始数据是三维空间中的散点集合，称为点云。本章将介绍点云处理的基础算法，包括坐标变换、滤波去噪和地面分割。这些算法是后续高级处理的基础，对于理解和应用激光雷达数据至关重要。通过本章学习，读者将掌握点云数据的基本操作方法，并能够实现实用的预处理流程。</p>
+<h2 id="81">8.1 坐标变换</h2>
+<p>激光雷达扫描得到的原始数据通常以球坐标形式表示，需要转换到笛卡尔坐标系才能进行后续处理。此外，在移动平台上还需要考虑运动补偿。</p>
+<h3 id="811">8.1.1 球坐标到笛卡尔坐标转换</h3>
+<p>激光雷达测量三个基本参数：</p>
+<ul>
+<li>距离 r：激光发射到接收的时间差计算得出</li>
+<li>水平角 θ（方位角）：激光扫描的水平旋转角度</li>
+<li>垂直角 φ（俯仰角）：激光束相对于水平面的角度</li>
+</ul>
+<p><strong>坐标系约定</strong>：
+不同厂商的激光雷达可能采用不同的坐标系定义，常见的有：</p>
+<ol>
+<li><strong>右手坐标系（ROS标准）</strong>：X向前，Y向左，Z向上</li>
+<li><strong>Velodyne坐标系</strong>：X向前，Y向左，Z向上，φ向下为正</li>
+<li><strong>Hesai坐标系</strong>：X向右，Y向前，Z向上</li>
+</ol>
+<p>转换公式（以ROS标准为例）：</p>
+<div class="codehilite"><pre><span></span><code>x = r·cos(φ)·cos(θ)
+y = r·cos(φ)·sin(θ)
+z = r·sin(φ)
+</code></pre></div>
+
+<p><strong>详细推导</strong>：
+从球坐标系到笛卡尔坐标系的转换基于三角函数关系：</p>
+<ol>
+<li>先将点投影到XY平面：r_xy = r·cos(φ)</li>
+<li>在XY平面内分解：x = r_xy·cos(θ), y = r_xy·sin(θ)</li>
+<li>Z分量直接计算：z = r·sin(φ)</li>
+</ol>
+<p><strong>计算实例1</strong>：某激光雷达测得一点的球坐标为 r=10m, θ=30°, φ=5°</p>
+<div class="codehilite"><pre><span></span><code>x = 10 × cos(5°) × cos(30°) = 10 × 0.9962 × 0.8660 = 8.628 m
+y = 10 × cos(5°) × sin(30°) = 10 × 0.9962 × 0.5000 = 4.981 m
+z = 10 × sin(5°) = 10 × 0.0872 = 0.872 m
+</code></pre></div>
+
+<p><strong>计算实例2</strong>：考虑16线激光雷达的多个扫描线
+假设垂直视场角范围为-15°到+15°，16线均匀分布：</p>
+<div class="codehilite"><pre><span></span><code>线号  垂直角φ    距离r=20m时的高度z
+0     +15°       z = 20×sin(15°) = 5.18m
+1     +13°       z = 20×sin(13°) = 4.50m
+2     +11°       z = 20×sin(11°) = 3.82m
+...
+7     +1°        z = 20×sin(1°) = 0.35m
+8     -1°        z = 20×sin(-1°) = -0.35m
+...
+15    -15°       z = 20×sin(-15°) = -5.18m
+</code></pre></div>
+
+<p><strong>角度分辨率对坐标精度的影响</strong>：
+设角度分辨率为Δθ = 0.1°，在不同距离r下，横向误差：</p>
+<div class="codehilite"><pre><span></span><code>Δx_lateral = r × sin(Δθ/2) ≈ r × Δθ/2 (弧度)
+
+距离r    角度误差Δθ    横向误差
+10m      0.1°         1.7cm
+50m      0.1°         8.7cm
+100m     0.1°         17.5cm
+</code></pre></div>
+
+<h3 id="812">8.1.2 坐标系定义</h3>
+<p>常见的激光雷达坐标系定义：</p>
+<ul>
+<li><strong>传感器坐标系</strong>：原点在激光雷达光学中心</li>
+<li>X轴：指向前方</li>
+<li>Y轴：指向左侧</li>
+<li>
+<p>Z轴：指向上方（右手坐标系）</p>
+</li>
+<li>
+<p><strong>车体坐标系</strong>（用于车载应用）：</p>
+</li>
+<li>原点：车辆后轴中心在地面的投影</li>
+<li>X轴：车辆前进方向</li>
+<li>Y轴：车辆左侧</li>
+<li>Z轴：垂直向上</li>
+</ul>
+<h3 id="813">8.1.3 坐标系转换矩阵</h3>
+<p>从传感器坐标系到车体坐标系的转换：</p>
+<p>P_vehicle = R × P_sensor + T</p>
+<p>其中：</p>
+<ul>
+<li>R 是3×3旋转矩阵</li>
+<li>T 是3×1平移向量</li>
+</ul>
+<p><strong>旋转矩阵的三种表示方法</strong>：</p>
+<ol>
+<li><strong>欧拉角表示</strong>（ZYX顺序，即yaw-pitch-roll）：</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>R = Rz(γ) × Ry(β) × Rx(α)
+</code></pre></div>
+
+<p>其中各基本旋转矩阵为：</p>
+<div class="codehilite"><pre><span></span><code>Rx(α) = [1    0       0    ]
+        [0    cos(α) -sin(α)]
+        [0    sin(α)  cos(α)]
+
+Ry(β) = [ cos(β)  0  sin(β)]
+        [ 0       1  0     ]
+        [-sin(β)  0  cos(β)]
+
+Rz(γ) = [cos(γ) -sin(γ)  0]
+        [sin(γ)  cos(γ)  0]
+        [0       0       1]
+</code></pre></div>
+
+<ol start="2">
+<li><strong>四元数表示</strong>：
+四元数 q = [w, x, y, z]，其中 w² + x² + y² + z² = 1</li>
+</ol>
+<p>旋转矩阵：</p>
+<div class="codehilite"><pre><span></span><code>R = [1-2(y²+z²)   2(xy-wz)    2(xz+wy) ]
+    [2(xy+wz)     1-2(x²+z²)  2(yz-wx) ]
+    [2(xz-wy)     2(yz+wx)    1-2(x²+y²)]
+</code></pre></div>
+
+<ol start="3">
+<li><strong>轴角表示</strong>：
+绕轴n = [nx, ny, nz]旋转角度θ：</li>
+</ol>
+<div class="codehilite"><pre><span></span><code>R = I + sin(θ)·K + (1-cos(θ))·K²
+</code></pre></div>
+
+<p>其中K是n的反对称矩阵。</p>
+<p><strong>计算实例1</strong>：激光雷达安装在车顶，相对车体坐标系的安装参数为：</p>
+<ul>
+<li>平移：T = [0, 0, 1.8]ᵀ m</li>
+<li>旋转：roll=0°, pitch=2°, yaw=0°</li>
+</ul>
+<p>对于传感器坐标系中的点 P_sensor = [5, 3, -0.5]ᵀ：</p>
+<div class="codehilite"><pre><span></span><code>R = Rz(0°) × Ry(2°) × Rx(0°) = 
+[0.9994  0      0.0349]
+[0       1      0     ]
+[-0.0349 0      0.9994]
+
+P_vehicle = R × P_sensor + T = 
+[0.9994  0      0.0349] [5]   [0]   [4.983]
+[0       1      0     ] [3] + [0] = [3.000]
+[-0.0349 0      0.9994] [-0.5] [1.8] [1.626]
+</code></pre></div>
+
+<p><strong>计算实例2</strong>：考虑更复杂的安装角度
+激光雷达安装参数：</p>
+<ul>
+<li>平移：T = [0.3, -0.1, 1.5]ᵀ m  </li>
+<li>旋转：roll=1°, pitch=3°, yaw=2°</li>
+</ul>
+<p>详细计算过程：</p>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">计算各旋转矩阵</span><span class="err">：</span>
+<span class="n">Rx</span><span class="p">(</span><span class="mf">1</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[</span><span class="mf">1</span><span class="w">      </span><span class="mf">0</span><span class="w">        </span><span class="mf">0</span><span class="w">     </span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="mf">0</span><span class="w">      </span><span class="mf">0.9998</span><span class="w">  </span><span class="o">-</span><span class="mf">0.0175</span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="mf">0</span><span class="w">      </span><span class="mf">0.0175</span><span class="w">   </span><span class="mf">0.9998</span><span class="err">]</span>
+
+<span class="n">Ry</span><span class="p">(</span><span class="mf">3</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[</span><span class="w"> </span><span class="mf">0.9986</span><span class="w">  </span><span class="mf">0</span><span class="w">      </span><span class="mf">0.0523</span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="w"> </span><span class="mf">0</span><span class="w">       </span><span class="mf">1</span><span class="w">      </span><span class="mf">0</span><span class="w">     </span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="o">-</span><span class="mf">0.0523</span><span class="w">  </span><span class="mf">0</span><span class="w">      </span><span class="mf">0.9986</span><span class="err">]</span>
+
+<span class="n">Rz</span><span class="p">(</span><span class="mf">2</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[</span><span class="mf">0.9994</span><span class="w">  </span><span class="o">-</span><span class="mf">0.0349</span><span class="w">  </span><span class="mf">0</span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="mf">0.0349</span><span class="w">   </span><span class="mf">0.9994</span><span class="w">  </span><span class="mf">0</span><span class="err">]</span>
+<span class="w">         </span><span class="err">[</span><span class="mf">0</span><span class="w">        </span><span class="mf">0</span><span class="w">       </span><span class="mf">1</span><span class="err">]</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">组合旋转矩阵</span><span class="err">：</span>
+<span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Rz</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="n">Ry</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="n">Rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="err">[</span><span class="mf">0.9981</span><span class="w">  </span><span class="o">-</span><span class="mf">0.0349</span><span class="w">   </span><span class="mf">0.0519</span><span class="err">]</span>
+<span class="err">[</span><span class="mf">0.0362</span><span class="w">   </span><span class="mf">0.9990</span><span class="w">  </span><span class="o">-</span><span class="mf">0.0261</span><span class="err">]</span>
+<span class="err">[</span><span class="o">-</span><span class="mf">0.0509</span><span class="w">  </span><span class="mf">0.0280</span><span class="w">   </span><span class="mf">0.9983</span><span class="err">]</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">对点P_sensor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[</span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="mf">5</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1</span><span class="err">]</span><span class="n">进行转换</span><span class="err">：</span>
+<span class="n">P_vehicle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="n">P_sensor</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="err">[</span><span class="mf">9.720</span><span class="err">]</span><span class="w">   </span><span class="err">[</span><span class="mf">0.3</span><span class="err">]</span><span class="w">   </span><span class="err">[</span><span class="mf">10.020</span><span class="err">]</span>
+<span class="err">[</span><span class="mf">0.835</span><span class="err">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="err">[</span><span class="o">-</span><span class="mf">0.1</span><span class="err">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">[</span><span class="mf">0.735</span><span class="err">]</span>
+<span class="err">[</span><span class="o">-</span><span class="mf">0.249</span><span class="err">]</span><span class="w">  </span><span class="err">[</span><span class="mf">1.5</span><span class="err">]</span><span class="w">   </span><span class="err">[</span><span class="mf">1.251</span><span class="err">]</span>
+</code></pre></div>
+
+<p><strong>坐标系转换的误差传播</strong>：
+考虑标定误差对最终坐标的影响：</p>
+<div class="codehilite"><pre><span></span><code>δP = ∂P/∂R × δR + ∂P/∂T × δT + ∂P/∂P_sensor × δP_sensor
+
+主要误差源：
+
+1. 角度标定误差：δα, δβ, δγ ≈ 0.1°
+2. 位置标定误差：δT ≈ 1cm
+3. 测量误差：δP_sensor ≈ 2cm
+
+误差传播示例（r=50m）：
+角度误差贡献：50m × sin(0.1°) ≈ 8.7cm
+位置误差贡献：1cm（直接传递）
+总误差：√(8.7² + 1²) ≈ 8.8cm
+</code></pre></div>
+
+<h3 id="814">8.1.4 运动补偿</h3>
+<p>机械旋转式激光雷达完成一帧扫描需要100ms，期间载体可能发生位移和旋转，导致点云畸变。</p>
+<p><strong>点云畸变的表现</strong>：</p>
+<ol>
+<li><strong>平移畸变</strong>：直线变成曲线</li>
+<li><strong>旋转畸变</strong>：平面变成扭曲面</li>
+<li><strong>尺度畸变</strong>：物体尺寸失真</li>
+</ol>
+<p><strong>运动模型</strong>：</p>
+<ol>
+<li>
+<p><strong>匀速运动模型</strong>（最常用）：
+- 线速度：v = [vx, vy, vz]ᵀ
+- 角速度：ω = [ωx, ωy, ωz]ᵀ</p>
+</li>
+<li>
+<p><strong>匀加速运动模型</strong>：
+- 加速度：a = [ax, ay, az]ᵀ
+- 角加速度：α = [αx, αy, αz]ᵀ</p>
+</li>
+</ol>
+<p>对于时刻 t_i 采集的点，补偿公式：</p>
+<div class="codehilite"><pre><span></span><code>P_comp(t_i) = R(t_i) × P_raw(t_i) + T(t_i)
+</code></pre></div>
+
+<p>其中：</p>
+<div class="codehilite"><pre><span></span><code>匀速模型：
+T(t_i) = v × t_i
+R(t_i) = exp(ω^ × t_i)  （ω^为反对称矩阵）
+
+匀加速模型：
+T(t_i) = v × t_i + 0.5 × a × t_i²
+R(t_i) = exp((ω + 0.5 × α × t_i)^ × t_i)
+</code></pre></div>
+
+<p><strong>反对称矩阵计算</strong>：
+对于角速度ω = [ωx, ωy, ωz]ᵀ，反对称矩阵：</p>
+<div class="codehilite"><pre><span></span><code>ω^ = [ 0   -ωz   ωy]
+     [ ωz   0   -ωx]
+     [-ωy   ωx   0 ]
+</code></pre></div>
+
+<p><strong>罗德里格斯公式</strong>（计算旋转矩阵）：</p>
+<div class="codehilite"><pre><span></span><code>R = I + sin(θ)/θ × ω^ + (1-cos(θ))/θ² × (ω^)²
+其中 θ = ||ω|| × t_i
+</code></pre></div>
+
+<p><strong>计算实例1</strong>：车辆以 v=20m/s 前进，角速度 ω=0.1rad/s（左转），激光雷达扫描周期100ms。</p>
+<p>对于扫描中点（t=50ms）的补偿：</p>
+<div class="codehilite"><pre><span></span><code>平移补偿：T = [20, 0, 0]ᵀ × 0.05 = [1.0, 0, 0]ᵀ m
+旋转角度：θ = 0.1 × 0.05 = 0.005 rad ≈ 0.29°
+
+旋转矩阵（使用小角度近似）：
+R ≈ [1      -0.005   0    ]
+    [0.005   1       0    ]
+    [0       0       1    ]
+
+对于原始点P_raw = [10, 5, 0]：
+P_comp = R × P_raw + T = [10.975, 4.950, 0]
+</code></pre></div>
+
+<p><strong>计算实例2</strong>：高速转弯场景
+车速v=30m/s，转弯半径R=100m，扫描周期100ms：</p>
+<div class="codehilite"><pre><span></span><code>角速度：ω = v/R = 30/100 = 0.3 rad/s
+扫描期间转过角度：Δθ = 0.3 × 0.1 = 0.03 rad ≈ 1.72°
+
+不同时刻的点补偿量：
+t=0ms:    ΔX=0m,     ΔY=0m
+t=25ms:   ΔX=0.75m,  ΔY=0.028m  
+t=50ms:   ΔX=1.50m,  ΔY=0.112m
+t=75ms:   ΔX=2.25m,  ΔY=0.253m
+t=100ms:  ΔX=3.00m,  ΔY=0.450m
+</code></pre></div>
+
+<p><strong>基于IMU的精确补偿</strong>：
+利用高频IMU数据（如200Hz）进行更精确的运动估计：</p>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">IMU数据插值到激光点时间戳</span>
+<span class="mf">2.</span><span class="w"> </span><span class="n">积分计算位姿变化</span><span class="err">：</span>
+<span class="w">   </span><span class="n">p</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p₀</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="err">∫</span><span class="n">v</span><span class="p">(</span><span class="n">τ</span><span class="p">)</span><span class="n">dτ</span>
+<span class="w">   </span><span class="n">q</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q₀</span><span class="w"> </span><span class="err">⊗</span><span class="w"> </span><span class="err">∫</span><span class="n">ω</span><span class="p">(</span><span class="n">τ</span><span class="p">)</span><span class="n">dτ</span><span class="w">  </span><span class="err">（</span><span class="n">四元数积分</span><span class="err">）</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">应用补偿变换</span>
+</code></pre></div>
+
+<p><strong>补偿效果评估</strong>：
+通过平面拟合残差评估补偿效果：</p>
+<div class="codehilite"><pre><span></span><code>补偿前残差：σ_before = 15cm
+补偿后残差：σ_after = 3cm
+改善率：(15-3)/15 × 100% = 80%
+</code></pre></div>
+
+<h3 id="815">8.1.5 时间戳对齐</h3>
+<p>不同激光雷达的时间戳定义不同：</p>
+<ul>
+<li><strong>帧首时间戳</strong>：第一个点的采集时间</li>
+<li><strong>帧尾时间戳</strong>：最后一个点的采集时间</li>
+<li><strong>帧中时间戳</strong>：扫描中间时刻</li>
+</ul>
+<p>点的实际采集时间计算：</p>
+<div class="codehilite"><pre><span></span><code>t_point = t_frame + (angle / 360°) × T_scan
+</code></pre></div>
+
+<p>其中：</p>
+<ul>
+<li>angle：点的方位角</li>
+<li>T_scan：完整扫描周期（如100ms）</li>
+</ul>
+<h3 id="816">8.1.6 多激光雷达坐标统一</h3>
+<p>大型系统可能使用多个激光雷达，需要将所有点云统一到同一坐标系。</p>
+<p><strong>标定方法</strong>：</p>
+<ol>
+<li>使用标定板或特征点</li>
+<li>最小化重叠区域的配准误差</li>
+</ol>
+<p>标定优化目标函数：</p>
+<div class="codehilite"><pre><span></span><code>E = Σᵢⱼ ||P_i - (R_j × P_j + T_j)||²
+</code></pre></div>
+
+<h3 id="817">8.1.7 坐标精度分析</h3>
+<p>坐标转换引入的误差主要来源：</p>
+<ol>
+<li><strong>角度测量误差</strong>：δθ, δφ</li>
+<li><strong>距离测量误差</strong>：δr</li>
+<li><strong>标定参数误差</strong>：δR, δT</li>
+<li><strong>时间同步误差</strong>：δt</li>
+</ol>
+<p><strong>完整的误差传播模型</strong>：</p>
+<p>对于球坐标到笛卡尔坐标的转换，雅可比矩阵为：</p>
+<div class="codehilite"><pre><span></span><code>J = [∂x/∂r  ∂x/∂θ  ∂x/∂φ]
+    [∂y/∂r  ∂y/∂θ  ∂y/∂φ]
+    [∂z/∂r  ∂z/∂θ  ∂z/∂φ]
+</code></pre></div>
+
+<p>具体偏导数：</p>
+<div class="codehilite"><pre><span></span><code>∂x/∂r = cos(φ)cos(θ)
+∂x/∂θ = -r·cos(φ)sin(θ)  
+∂x/∂φ = -r·sin(φ)cos(θ)
+
+∂y/∂r = cos(φ)sin(θ)
+∂y/∂θ = r·cos(φ)cos(θ)
+∂y/∂φ = -r·sin(φ)sin(θ)
+
+∂z/∂r = sin(φ)
+∂z/∂θ = 0
+∂z/∂φ = r·cos(φ)
+</code></pre></div>
+
+<p>协方差矩阵：</p>
+<div class="codehilite"><pre><span></span><code>Σ_xyz = J × Σ_rθφ × J^T
+</code></pre></div>
+
+<p><strong>数值示例1</strong>：r=50m, θ=45°, φ=0°, σ_r=2cm, σ_θ=σ_φ=0.1°</p>
+<div class="codehilite"><pre><span></span><code><span class="mf">1.</span><span class="w"> </span><span class="n">计算偏导数</span><span class="err">：</span>
+<span class="err">∂</span><span class="n">x</span><span class="o">/</span><span class="err">∂</span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="mf">0</span><span class="err">°</span><span class="p">)</span><span class="nb">cos</span><span class="p">(</span><span class="mf">45</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.707</span>
+<span class="err">∂</span><span class="n">x</span><span class="o">/</span><span class="err">∂</span><span class="n">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">50</span><span class="err">×</span><span class="nb">cos</span><span class="p">(</span><span class="mf">0</span><span class="err">°</span><span class="p">)</span><span class="nb">sin</span><span class="p">(</span><span class="mf">45</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">35.36</span><span class="n">m</span>
+<span class="err">∂</span><span class="n">x</span><span class="o">/</span><span class="err">∂</span><span class="n">φ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">50</span><span class="err">×</span><span class="nb">sin</span><span class="p">(</span><span class="mf">0</span><span class="err">°</span><span class="p">)</span><span class="nb">cos</span><span class="p">(</span><span class="mf">45</span><span class="err">°</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span>
+
+<span class="mf">2.</span><span class="w"> </span><span class="n">误差传播</span><span class="err">：</span>
+<span class="n">σ²_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.707</span><span class="err">×</span><span class="mf">0.02</span><span class="p">)</span><span class="n">²</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">35.36</span><span class="err">×</span><span class="mf">0.00175</span><span class="p">)</span><span class="n">²</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0</span><span class="n">²</span>
+<span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0002</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.0038</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.004</span>
+<span class="n">σ_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.064</span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">6.4</span><span class="n">cm</span>
+
+<span class="mf">3.</span><span class="w"> </span><span class="n">各分量贡献</span><span class="err">：</span>
+<span class="n">距离误差贡献</span><span class="err">：</span><span class="mf">0.014</span><span class="n">m</span><span class="w"> </span><span class="p">(</span><span class="mf">22</span><span class="err">%</span><span class="p">)</span>
+<span class="n">角度误差贡献</span><span class="err">：</span><span class="mf">0.062</span><span class="n">m</span><span class="w"> </span><span class="p">(</span><span class="mf">78</span><span class="err">%</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>数值示例2</strong>：考虑不同距离下的误差</p>
+<div class="codehilite"><pre><span></span><code>距离r   σ_r    σ_θ     x方向总误差   角度误差占比
+10m     2cm    0.1°    2.3cm         34%
+30m     2cm    0.1°    5.5cm         73%
+50m     2cm    0.1°    8.8cm         82%
+100m    3cm    0.1°    17.6cm        89%
+200m    5cm    0.1°    35.2cm        93%
+</code></pre></div>
+
+<p><strong>标定误差的影响</strong>：
+考虑激光雷达安装角度误差δα=0.1°，在不同距离的影响：</p>
+<div class="codehilite"><pre><span></span><code>横向误差：Δ_lateral = r × sin(δα)
+
+距离r    横向误差
+10m      1.7cm
+50m      8.7cm
+100m     17.5cm
+</code></pre></div>
+
+<p><strong>运动补偿误差</strong>：
+速度估计误差δv=0.1m/s，角速度误差δω=0.01rad/s：</p>
+<div class="codehilite"><pre><span></span><code>扫描周期T=100ms时：
+位置误差：δP = δv × T = 0.1 × 0.1 = 0.01m = 1cm
+角度误差：δθ = δω × T = 0.01 × 0.1 = 0.001rad ≈ 0.057°
+</code></pre></div>
+
+<p><strong>综合误差模型</strong>：</p>
+<div class="codehilite"><pre><span></span><code>总误差 = √(测量误差² + 标定误差² + 运动误差² + 时间误差²)
+
+典型值（r=50m，v=20m/s）：
+
+- 测量误差：6.4cm
+- 标定误差：8.7cm  
+- 运动误差：2.0cm
+- 时间误差：1.0cm
+总误差：√(6.4² + 8.7² + 2.0² + 1.0²) ≈ 11.0cm
+</code></pre></div>
+
+<p><strong>误差优化策略</strong>：</p>
+<ol>
+<li><strong>近距离</strong>：优化距离测量精度</li>
+<li><strong>远距离</strong>：提高角度分辨率</li>
+<li><strong>高速运动</strong>：增加IMU辅助</li>
+<li><strong>多传感器</strong>：互相校验减少系统误差</li>
+</ol>
+<h2 id="82">8.2 滤波算法</h2>
+<p>原始点云数据包含各种噪声：测量噪声、多路径反射、大气散射等。滤波是点云预处理的关键步骤，用于去除噪声点和离群点，同时保留有用的几何特征。</p>
+<h3 id="821-statistical-outlier-removal">8.2.1 统计滤波（Statistical Outlier Removal）</h3>
+<p>统计滤波基于点云的局部密度分布，去除明显偏离邻域统计特性的离群点。</p>
+<p><strong>算法原理</strong>：</p>
+<ol>
+<li>对每个点，计算其到k个最近邻点的平均距离</li>
+<li>计算所有点的平均距离的均值μ和标准差σ</li>
+<li>去除满足条件的点：|d_i - μ| &gt; α·σ</li>
+</ol>
+<p><strong>参数选择</strong>：</p>
+<ul>
+<li>k：邻域点数，典型值10-50</li>
+<li>α：标准差倍数，典型值1.0-3.0</li>
+</ul>
+<p><strong>计算实例</strong>：
+设某点P的10个最近邻距离为：[0.05, 0.06, 0.05, 0.07, 0.06, 0.08, 0.05, 0.06, 0.07, 0.55]m</p>
+<div class="codehilite"><pre><span></span><code>该点的平均距离：d_p = 0.13m
+全局统计：μ = 0.06m, σ = 0.02m
+判断：|0.13 - 0.06| = 0.07 &gt; 2×0.02 = 0.04
+结论：该点为离群点，应被滤除
+</code></pre></div>
+
+<h3 id="822-radius-outlier-removal">8.2.2 半径滤波（Radius Outlier Removal）</h3>
+<p>半径滤波通过统计固定半径内的邻域点数来判断离群点。</p>
+<p><strong>算法步骤</strong>：</p>
+<ol>
+<li>设定搜索半径r和最小点数阈值n_min</li>
+<li>统计每个点半径r内的邻域点数n</li>
+<li>若n &lt; n_min，则标记为离群点</li>
+</ol>
+<p><strong>参数影响分析</strong>：</p>
+<ul>
+<li>r过小：可能误删稀疏区域的有效点</li>
+<li>r过大：无法去除小尺度噪声</li>
+<li>建议：r = 2-5倍点云平均间距</li>
+</ul>
+<p><strong>密度自适应改进</strong>：</p>
+<div class="codehilite"><pre><span></span><code>r_adaptive = r_base × √(d_avg / d_local)
+</code></pre></div>
+
+<p>其中d_avg是全局平均点间距，d_local是局部平均点间距。</p>
+<h3 id="823-voxel-grid-filter">8.2.3 体素滤波（Voxel Grid Filter）</h3>
+<p>体素滤波将空间划分为规则的立方体网格，每个体素内的所有点用一个代表点替换。</p>
+<p><strong>基本算法</strong>：</p>
+<ol>
+<li>计算点云的包围盒</li>
+<li>按体素大小划分网格</li>
+<li>每个体素内计算质心作为代表点</li>
+</ol>
+<p><strong>体素索引计算</strong>：</p>
+<div class="codehilite"><pre><span></span><code>i = floor((x - x_min) / voxel_size)
+j = floor((y - y_min) / voxel_size)
+k = floor((z - z_min) / voxel_size)
+voxel_index = i + j×n_x + k×n_x×n_y
+</code></pre></div>
+
+<p><strong>计算复杂度</strong>：O(n)，其中n为点数</p>
+<p><strong>降采样率计算</strong>：
+原始点数N，体素滤波后点数M
+降采样率 = M/N</p>
+<p><strong>实例</strong>：100万点的点云，体素大小0.1m，滤波后约10万点，降采样率10%。</p>
+<h3 id="824-bilateral-filter">8.2.4 双边滤波（Bilateral Filter）</h3>
+<p>双边滤波在平滑噪声的同时保持边缘特征，考虑空间距离和属性相似度。</p>
+<p><strong>滤波公式</strong>：</p>
+<div class="codehilite"><pre><span></span><code>p&#39;_i = Σⱼ w_ij × p_j / Σⱼ w_ij
+</code></pre></div>
+
+<p>权重函数：</p>
+<div class="codehilite"><pre><span></span><code>w_ij = exp(-||p_i - p_j||² / (2σ_s²)) × exp(-|I_i - I_j|² / (2σ_r²))
+</code></pre></div>
+
+<p>其中：</p>
+<ul>
+<li>σ_s：空间域标准差（控制平滑范围）</li>
+<li>σ_r：值域标准差（控制边缘保持）</li>
+<li>I：点的属性（如反射强度、法向量）</li>
+</ul>
+<p><strong>参数设置建议</strong>：</p>
+<ul>
+<li>σ_s = 2-5倍平均点间距</li>
+<li>σ_r = 0.1-0.3（归一化强度）</li>
+</ul>
+<h3 id="825-mls">8.2.5 移动最小二乘（MLS）滤波</h3>
+<p>MLS通过局部曲面拟合实现平滑和上采样。</p>
+<p><strong>算法步骤</strong>：</p>
+<ol>
+<li>对每个点，拟合局部二次曲面</li>
+<li>将点投影到拟合曲面上</li>
+</ol>
+<p>局部曲面方程：</p>
+<div class="codehilite"><pre><span></span><code>f(x,y) = a₀ + a₁x + a₂y + a₃x² + a₄xy + a₅y²
+</code></pre></div>
+
+<p>最小二乘求解：</p>
+<div class="codehilite"><pre><span></span><code>min Σᵢ wᵢ(zᵢ - f(xᵢ,yᵢ))²
+</code></pre></div>
+
+<p>权重函数：wᵢ = exp(-d²ᵢ/h²)，h为带宽参数。</p>
+<h3 id="826-conditional-filter">8.2.6 条件滤波（Conditional Filter）</h3>
+<p>根据点的属性（坐标、强度、法向量等）进行条件筛选。</p>
+<p><strong>常用条件</strong>：</p>
+<ol>
+<li>距离范围：r_min &lt; r &lt; r_max</li>
+<li>高度范围：z_min &lt; z &lt; z_max</li>
+<li>强度阈值：I &gt; I_threshold</li>
+<li>入射角限制：θ_incident &lt; θ_max</li>
+</ol>
+<p><strong>组合条件示例</strong>：
+保留车辆前方120°、距离5-80m、高度-2m到3m的点：</p>
+<div class="codehilite"><pre><span></span><code>条件1: -60° &lt; θ &lt; 60°
+条件2: 5m &lt; r &lt; 80m
+条件3: -2m &lt; z &lt; 3m
+满足所有条件的点保留
+</code></pre></div>
+
+<h3 id="827">8.2.7 时序滤波</h3>
+<p>利用多帧数据的时间相关性进行滤波。</p>
+<p><strong>滑动平均</strong>：</p>
+<div class="codehilite"><pre><span></span><code>p&#39;(t) = Σᵢ₌₀ⁿ⁻¹ αᵢ × p(t-i)
+</code></pre></div>
+
+<p><strong>卡尔曼滤波</strong>（用于动态点跟踪）：
+预测：x̂(k|k-1) = F × x̂(k-1|k-1)
+更新：x̂(k|k) = x̂(k|k-1) + K × (z(k) - H × x̂(k|k-1))</p>
+<h3 id="828">8.2.8 滤波算法性能比较</h3>
+<p>| 算法 | 时间复杂度 | 保边缘能力 | 适用场景 |</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>时间复杂度</th>
+<th>保边缘能力</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>统计滤波</td>
+<td>O(n·k·log k)</td>
+<td>差</td>
+<td>离群点去除</td>
+</tr>
+<tr>
+<td>半径滤波</td>
+<td>O(n²)</td>
+<td>差</td>
+<td>稀疏噪声</td>
+</tr>
+<tr>
+<td>体素滤波</td>
+<td>O(n)</td>
+<td>中</td>
+<td>快速降采样</td>
+</tr>
+<tr>
+<td>双边滤波</td>
+<td>O(n·k)</td>
+<td>优</td>
+<td>保特征平滑</td>
+</tr>
+<tr>
+<td>MLS滤波</td>
+<td>O(n·k²)</td>
+<td>优</td>
+<td>曲面重建</td>
+</tr>
+</tbody>
+</table>
+<h3 id="829">8.2.9 滤波参数自适应</h3>
+<p>根据点云特性自动调整滤波参数：</p>
+<p><strong>密度估计</strong>：</p>
+<div class="codehilite"><pre><span></span><code>density = n_points / volume
+k_adaptive = max(10, min(50, density × 0.001))
+</code></pre></div>
+
+<p><strong>噪声水平估计</strong>：
+通过局部平面拟合的残差估计噪声：</p>
+<div class="codehilite"><pre><span></span><code>noise_level = median(residuals)
+filter_threshold = 3 × noise_level
+</code></pre></div>
+
+<h2 id="83">8.3 地面分割</h2>
+<p>地面分割是自动驾驶和机器人导航中的基础任务，将点云分为地面点和非地面点。准确的地面分割对后续的障碍物检测、可通行区域分析至关重要。</p>
+<h3 id="831">8.3.1 基于高度的简单分割</h3>
+<p>最简单的方法是设置高度阈值，但仅适用于平坦地面。</p>
+<p><strong>基本方法</strong>：</p>
+<div class="codehilite"><pre><span></span><code>if z &lt; z_threshold:
+    点标记为地面
+else:
+    点标记为非地面
+</code></pre></div>
+
+<p><strong>局限性</strong>：</p>
+<ul>
+<li>无法处理坡道</li>
+<li>对传感器倾斜敏感</li>
+<li>需要精确标定</li>
+</ul>
+<h3 id="832-ransac">8.3.2 RANSAC地面拟合</h3>
+<p>RANSAC（Random Sample Consensus）通过随机采样拟合地面平面模型。</p>
+<p><strong>平面模型</strong>：ax + by + cz + d = 0</p>
+<p><strong>算法步骤</strong>：</p>
+<ol>
+<li>随机选择3个点，计算平面参数</li>
+<li>计算所有点到平面的距离</li>
+<li>统计内点数（距离小于阈值）</li>
+<li>重复N次，选择内点最多的模型</li>
+</ol>
+<p><strong>迭代次数计算</strong>：</p>
+<div class="codehilite"><pre><span></span><code>N = log(1-p) / log(1-w³)
+</code></pre></div>
+
+<p>其中：</p>
+<ul>
+<li>p：期望成功概率（如0.99）</li>
+<li>w：内点比例估计</li>
+</ul>
+<p><strong>计算实例</strong>：
+假设地面点占比w=0.5，期望成功率p=0.99：</p>
+<div class="codehilite"><pre><span></span><code>N = log(0.01) / log(1-0.5³) = log(0.01) / log(0.875) = 35次
+</code></pre></div>
+
+<p><strong>距离阈值自适应</strong>：</p>
+<div class="codehilite"><pre><span></span><code>threshold = base_threshold × (1 + k × distance)
+</code></pre></div>
+
+<p>考虑测距误差随距离增长。</p>
+<h3 id="833-25d-grid-map">8.3.3 高程图方法（2.5D Grid Map）</h3>
+<p>将3D点云投影到2D网格，每个格子记录最低点高度。</p>
+<p><strong>网格划分</strong>：</p>
+<div class="codehilite"><pre><span></span><code>grid_x = floor((x - x_min) / resolution)
+grid_y = floor((y - y_min) / resolution)
+</code></pre></div>
+
+<p><strong>地面高度估计</strong>：</p>
+<ol>
+<li>每个格子内选择最低点作为地面候选</li>
+<li>相邻格子间进行平滑</li>
+<li>高度差异大于阈值的标记为非地面</li>
+</ol>
+<p><strong>坡度计算</strong>：</p>
+<div class="codehilite"><pre><span></span><code>slope_x = (h[i+1,j] - h[i-1,j]) / (2 × resolution)
+slope_y = (h[i,j+1] - h[i,j-1]) / (2 × resolution)
+slope = √(slope_x² + slope_y²)
+</code></pre></div>
+
+<p><strong>优势</strong>：</p>
+<ul>
+<li>计算效率高：O(n)</li>
+<li>易于实现</li>
+<li>适合实时处理</li>
+</ul>
+<h3 id="834-ray-ground-filter">8.3.4 扇形分割法（Ray Ground Filter）</h3>
+<p>利用激光雷达的扫描特性，将点云按方位角划分为扇形区域。</p>
+<p><strong>算法原理</strong>：</p>
+<ol>
+<li>将360°划分为若干扇区（如720个，每个0.5°）</li>
+<li>每个扇区内按距离排序</li>
+<li>从近到远判断地面点</li>
+</ol>
+<p><strong>地面判断条件</strong>：
+相邻两点的坡度：</p>
+<div class="codehilite"><pre><span></span><code>slope = (z₂ - z₁) / (r₂ - r₁)
+if slope &lt; slope_threshold:
+    标记为地面点
+</code></pre></div>
+
+<p><strong>多线激光雷达改进</strong>：
+考虑垂直相邻的扫描线：</p>
+<div class="codehilite"><pre><span></span><code>slope_radial = (z₂ - z₁) / (r₂ - r₁)
+slope_tangential = (z_upper - z_lower) / Δh_laser
+</code></pre></div>
+
+<h3 id="835">8.3.5 基于法向量的分割</h3>
+<p>计算每个点的局部法向量，根据法向量与垂直方向的夹角判断。</p>
+<p><strong>法向量计算</strong>（PCA方法）：</p>
+<ol>
+<li>选择k个最近邻点</li>
+<li>计算协方差矩阵C</li>
+<li>最小特征值对应的特征向量为法向量</li>
+</ol>
+<p><strong>地面判断</strong>：</p>
+<div class="codehilite"><pre><span></span><code>angle = arccos(|n · [0,0,1]|)
+if angle &lt; angle_threshold:
+    标记为地面点
+</code></pre></div>
+
+<p><strong>计算实例</strong>：
+法向量n=[0.05, 0.03, 0.998]，与z轴夹角：</p>
+<div class="codehilite"><pre><span></span><code>angle = arccos(0.998) = 3.6°
+若阈值为10°，则为地面点
+</code></pre></div>
+
+<h3 id="836">8.3.6 种子点生长法</h3>
+<p>从确定的地面种子点开始，逐步生长扩展地面区域。</p>
+<p><strong>种子点选择</strong>：</p>
+<ol>
+<li>选择传感器下方一定范围内的最低点</li>
+<li>使用RANSAC拟合初始地面</li>
+</ol>
+<p><strong>生长条件</strong>：</p>
+<div class="codehilite"><pre><span></span><code>|z_neighbor - z_seed| &lt; Δz_threshold
+且
+distance_to_plane &lt; d_threshold
+</code></pre></div>
+
+<p><strong>实现优化</strong>：</p>
+<ul>
+<li>使用优先队列管理待处理点</li>
+<li>采用八叉树加速邻域搜索</li>
+</ul>
+<h3 id="837-graph-based">8.3.7 基于图的分割（Graph-based）</h3>
+<p>将点云构建为图结构，使用图切割算法分割。</p>
+<p><strong>图构建</strong>：</p>
+<ul>
+<li>节点：每个点</li>
+<li>边：相邻点之间的连接</li>
+<li>权重：高度差或法向量差异</li>
+</ul>
+<p><strong>能量函数</strong>：</p>
+<div class="codehilite"><pre><span></span><code>E = Σᵢ D(i) + λ Σᵢⱼ V(i,j)
+</code></pre></div>
+
+<p>其中：</p>
+<ul>
+<li>D(i)：数据项（点i属于地面的代价）</li>
+<li>V(i,j)：平滑项（相邻点标签不同的代价）</li>
+</ul>
+<h3 id="838">8.3.8 深度学习方法</h3>
+<p>使用神经网络直接从点云学习地面特征。</p>
+<p><strong>网络输入特征</strong>：</p>
+<ul>
+<li>点坐标(x,y,z)</li>
+<li>反射强度</li>
+<li>局部几何特征</li>
+<li>相对高度</li>
+</ul>
+<p><strong>常用网络结构</strong>：</p>
+<ul>
+<li>PointNet：直接处理点云</li>
+<li>RangeNet：处理距离图像</li>
+<li>PolarNet：极坐标表示</li>
+</ul>
+<h3 id="839">8.3.9 多传感器融合地面分割</h3>
+<p>结合多个传感器信息提高分割准确性。</p>
+<p><strong>IMU辅助</strong>：
+利用IMU提供的倾斜角补偿点云：</p>
+<div class="codehilite"><pre><span></span><code>z_corrected = z - x×sin(pitch) - y×sin(roll)
+</code></pre></div>
+
+<p><strong>相机辅助</strong>：</p>
+<ul>
+<li>利用语义分割识别道路区域</li>
+<li>投影到点云约束地面范围</li>
+</ul>
+<h3 id="8310">8.3.10 地面分割评价指标</h3>
+<p><strong>精确率</strong>（Precision）：</p>
+<div class="codehilite"><pre><span></span><code>Precision = TP / (TP + FP)
+</code></pre></div>
+
+<p><strong>召回率</strong>（Recall）：</p>
+<div class="codehilite"><pre><span></span><code>Recall = TP / (TP + FN)
+</code></pre></div>
+
+<p><strong>F1分数</strong>：</p>
+<div class="codehilite"><pre><span></span><code>F1 = 2 × Precision × Recall / (Precision + Recall)
+</code></pre></div>
+
+<p><strong>实时性指标</strong>：</p>
+<ul>
+<li>处理时间 &lt; 50ms（20Hz）</li>
+<li>适应不同点云规模</li>
+</ul>
+<h3 id="8311">8.3.11 典型参数配置</h3>
+<p>| 场景 | RANSAC阈值 | 坡度阈值 | 高程图分辨率 |</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>RANSAC阈值</th>
+<th>坡度阈值</th>
+<th>高程图分辨率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>城市道路</td>
+<td>0.15m</td>
+<td>10°</td>
+<td>0.2m</td>
+</tr>
+<tr>
+<td>越野地形</td>
+<td>0.3m</td>
+<td>30°</td>
+<td>0.5m</td>
+</tr>
+<tr>
+<td>室内环境</td>
+<td>0.05m</td>
+<td>5°</td>
+<td>0.1m</td>
+</tr>
+<tr>
+<td>高速公路</td>
+<td>0.1m</td>
+<td>7°</td>
+<td>0.3m</td>
+</tr>
+</tbody>
+</table>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter7.html" class="nav-link prev">← Chapter 7: 激光雷达独特优势与性能极限</a><a href="chapter9.html" class="nav-link next">Chapter 9: 高级点云算法 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

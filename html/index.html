@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>激光雷达完整技术教程</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item active" >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达完整技术教程</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 1: 激光雷达基础原理</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 2: 激光雷达技术发展与主要厂商</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 3: 激光雷达类型与扫描机制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 4: 激光雷达制造技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 5: 信号处理与时序控制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 6: 误差源分析（非信号处理）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 7: 激光雷达独特优势与性能极限</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 8: 点云处理基础算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 9: 高级点云算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 10: 标定技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 11: 多传感器融合算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 12: 自动驾驶专用章节</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 13: 机器人应用（人形与仓储）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 14: 其他应用领域</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达教程项目说明</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <h1 id="_1">激光雷达完整技术教程</h1>
+<h2 id="_2">简介</h2>
+<p>本教程全面介绍激光雷达（LiDAR）技术，从基础原理到先进应用，涵盖设计、制造、信号处理、算法开发等各个方面。教程包含大量数学推导和计算实例，适合工程师、研究人员和相关专业学生深入学习。</p>
+<h2 id="_3">教程特色</h2>
+<ul>
+<li><strong>理论与实践结合</strong>：每个概念都配有详细的数学推导和实际计算示例</li>
+<li><strong>全产业链覆盖</strong>：从激光器设计到点云算法，从硬件制造到软件开发</li>
+<li><strong>应用导向</strong>：针对自动驾驶、机器人、工业检测等具体应用深入分析</li>
+<li><strong>最新技术</strong>：包含FMCW相干探测、固态激光雷达等前沿技术</li>
+</ul>
+<h2 id="_4">目标读者</h2>
+<ul>
+<li>激光雷达系统工程师</li>
+<li>自动驾驶感知算法工程师</li>
+<li>机器人导航研发人员</li>
+<li>光电系统设计师</li>
+<li>相关专业研究生</li>
+</ul>
+<h2 id="_5">使用说明</h2>
+<ol>
+<li>建议按章节顺序学习，每章都建立在前面章节的基础上</li>
+<li>数学公式均可直接用于工程计算</li>
+<li>代码示例以Python为主，保持简洁实用</li>
+<li>每章末尾有实践练习，帮助巩固理解</li>
+</ol>
+<h2 id="_6">章节导航</h2>
+<h3 id="_7">基础理论篇</h3>
+<ul>
+<li><a href="chapter1.html">第1章：激光雷达基础原理</a> - ToF、相干探测、雪崩探测</li>
+<li><a href="chapter2.html">第2章：技术发展与主要厂商</a> - 三代技术演进、产品对比</li>
+<li><a href="chapter3.html">第3章：激光雷达类型与扫描机制</a> - 机械、MEMS、OPA、Flash</li>
+</ul>
+<h3 id="_8">硬件设计篇</h3>
+<ul>
+<li><a href="chapter4.html">第4章：激光雷达制造技术</a> - 激光器、探测器、光学系统</li>
+<li><a href="chapter5.html">第5章：信号处理与时序控制</a> - TDC、波形处理、同步技术</li>
+<li><a href="chapter6.html">第6章：误差源分析</a> - 机械、电子、环境误差</li>
+</ul>
+<h3 id="_9">算法开发篇</h3>
+<ul>
+<li><a href="chapter7.html">第7章：激光雷达独特优势</a> - 暗场景、高精度、抗干扰</li>
+<li><a href="chapter8.html">第8章：点云处理基础</a> - 滤波、分割、坐标变换</li>
+<li><a href="chapter9.html">第9章：高级点云算法</a> - 配准、SLAM、目标检测</li>
+</ul>
+<h3 id="_10">系统集成篇</h3>
+<ul>
+<li><a href="chapter10.html">第10章：标定技术</a> - 内参、外参、在线标定</li>
+<li><a href="chapter11.html">第11章：多传感器融合</a> - 相机、毫米波、IMU、GPS融合</li>
+</ul>
+<h3 id="_11">应用实践篇</h3>
+<ul>
+<li><a href="chapter12.html">第12章：自动驾驶应用</a> - 车规要求、感知挑战、实时性</li>
+<li><a href="chapter13.html">第13章：机器人应用</a> - 人形机器人、仓储AGV</li>
+<li><a href="chapter14.html">第14章：其他应用领域</a> - 手持扫描、工业检测、测绘</li>
+</ul>
+<h2 id="_12">数学符号说明</h2>
+<ul>
+<li>$c$：光速 (3×10⁸ m/s)</li>
+<li>$f$：频率 (Hz)</li>
+<li>$λ$：波长 (m)</li>
+<li>$R$：距离 (m)</li>
+<li>$P$：功率 (W)</li>
+<li>$σ$：标准差</li>
+<li>$SNR$：信噪比</li>
+<li>$θ,φ$：方位角、俯仰角</li>
+</ul>
+<h2 id="_13">技术支持</h2>
+<p>遇到问题可通过以下方式获取帮助：</p>
+<ul>
+<li>查阅各章节的详细推导</li>
+<li>参考章节末尾的练习题解答</li>
+<li>使用提供的仿真代码验证理解</li>
+</ul>
+<h2 id="_14">版权说明</h2>
+<p>本教程为开源教育资源，遵循CC BY-SA 4.0协议。欢迎在标注来源的前提下使用和改编。</p>
+<hr />
+<p>开始学习：<a href="chapter1.html">第1章：激光雷达基础原理</a> →</p>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter1.html" class="nav-link next">Chapter 1: 激光雷达基础原理 →</a></nav>
+        </main>
+    </div>
+</body>
+</html>

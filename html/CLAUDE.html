@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="./">
+    <title>激光雷达教程项目说明</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/highlight.css">
+    <script src="assets/script.js" defer></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: false,
+                packages: {'[+]': ['noerrors', 'ams']}
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            },
+            loader: {
+                load: ['[tex]/noerrors', '[tex]/ams']
+            }
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h3>目录</h3>
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-search">
+                <input type="text" id="sidebar-search-input" placeholder="搜索..." autocomplete="off">
+            </div>
+            <div id="tree-container">
+                <nav class="tree-nav" role="tree">
+                    <div class="tree-item " >
+                        <a href="index.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达完整技术教程</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter1.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 1: 激光雷达基础原理</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter2.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 2: 激光雷达技术发展与主要厂商</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter3.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 3: 激光雷达类型与扫描机制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter4.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 4: 激光雷达制造技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter5.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 5: 信号处理与时序控制</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter6.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 6: 误差源分析（非信号处理）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter7.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 7: 激光雷达独特优势与性能极限</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter8.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 8: 点云处理基础算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter9.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 9: 高级点云算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter10.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 10: 标定技术</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter11.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 11: 多传感器融合算法</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter12.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 12: 自动驾驶专用章节</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter13.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 13: 机器人应用（人形与仓储）</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item " >
+                        <a href="chapter14.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">Chapter 14: 其他应用领域</span>
+                        </a>
+                    </div>
+                
+                    <div class="tree-item active" >
+                        <a href="CLAUDE.html" class="tree-link">
+                            <span class="tree-icon">📄</span>
+                            <span class="tree-title">激光雷达教程项目说明</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </nav>
+        
+        <main class="content">
+            <article>
+                <p>（交流可以用英文，本文档中文，保留这句）</p>
+<h1 id="_1">激光雷达教程项目说明</h1>
+<h2 id="_2">项目目标</h2>
+<p>编写一份激光雷达从原理到制造到后处理算法教程markdown，要包含大量的计算实例（能直接数学算就数学算，确有必要可用 python 但不要一大段）
+组织为 index.md + chapter1.md + ...</p>
+<h2 id="_3">工具说明</h2>
+<p>当需要时，可以通过 <code>gemini -p "深入回答：&lt;要问的问题&gt; -m gemini-2.5-pro"</code> 来获取 gemini-2.5-pro 的参考意见(gemini 系只问 gemini-2.5-pro 不问别人)
+当需要时，可以通过 `echo "&lt;要问的问题&gt;"|llm -m 4.1 来获取 gpt-4.1 的参考意见</p>
+<h2 id="_4">章节结构要求</h2>
+<p>每个章节应包含：</p>
+<ol>
+<li><strong>开篇段落</strong>：简要介绍本章内容和学习目标</li>
+<li><strong>本章小结</strong>：总结关键概念和公式</li>
+<li><strong>练习题</strong>：
+   - 每章包含6-8道练习题
+   - 50%基础题（帮助熟悉材料）
+   - 50%挑战题（包括开放性思考题）
+   - 每题提供提示（Hint）
+   - 答案默认折叠，不包含代码</li>
+</ol>
+<h2 id="_5">大纲</h2>
+<h3 id="chapter-1">Chapter 1: 激光雷达基础原理</h3>
+<ul>
+<li>1.1 光的时间飞行原理 (ToF)</li>
+<li>距离计算: d = c·t/2</li>
+<li>时间分辨率与距离精度: σ_d = c·σ_t/(2√2)</li>
+<li>光速修正因子: n(T,P,λ)</li>
+<li>1.2 相干探测原理 (FMCW)</li>
+<li>调频连续波: f(t) = f_0 + kt</li>
+<li>拍频计算: f_b = 2vf_0/c + 2Rk/c</li>
+<li>相位噪声影响: Δφ = 4πf_0R/c</li>
+<li>相干长度要求: L_c = c/(πΔf)</li>
+<li>1.3 雪崩探测原理</li>
+<li>雪崩增益: M = 1/[1-(V/V_br)^n]</li>
+<li>过剩噪声因子: F = kM + (1-k)(2-1/M)</li>
+<li>Geiger模式vs线性模式</li>
+<li>死时间与计数率: R_max = 1/τ_dead</li>
+<li>1.4 激光雷达方程</li>
+<li>接收功率: P_r = P_t·(ρ·A_r)/(π·R²)·η_atm·η_sys</li>
+<li>相干探测SNR: SNR = 2η·P_s·P_LO/(hνB)</li>
+<li>探测概率与虚警率</li>
+</ul>
+<h3 id="chapter-2">Chapter 2: 激光雷达技术发展与主要厂商</h3>
+<ul>
+<li>2.1 技术发展历程</li>
+<li>第一代：机械旋转式（2005-2010）<ul>
+<li>Velodyne HDL-64E (64线, $75k)</li>
+</ul>
+</li>
+<li>第二代：混合固态（2015-2020）<ul>
+<li>成本降至$1k-10k量级</li>
+</ul>
+</li>
+<li>第三代：纯固态（2020-）<ul>
+<li>目标成本&lt;$500</li>
+</ul>
+</li>
+<li>2.2 主要厂商与产品线</li>
+<li>Velodyne: Alpha Prime, Velarray</li>
+<li>Luminar: Iris, Hydra</li>
+<li>Innoviz: InnovizTwo, InnovizOne</li>
+<li>禾赛科技: AT128, QT128</li>
+<li>速腾聚创: M1, RS-LiDAR-M1</li>
+<li>华为: 96线车规级</li>
+<li>Livox: HAP, Mid-360</li>
+<li>2.3 技术路线对比</li>
+<li>性能指标矩阵</li>
+<li>成本分析模型</li>
+</ul>
+<h3 id="chapter-3">Chapter 3: 激光雷达类型与扫描机制</h3>
+<ul>
+<li>3.1 机械扫描系统</li>
+<li>角分辨率: Δθ = 360°/(f_rotation × t_pulse)</li>
+<li>点云密度分布: ρ(r,θ) = 1/(r·Δθ·Δφ)</li>
+<li>3.2 MEMS扫描</li>
+<li>谐振频率: f_0 = (1/2π)√(k/I)</li>
+<li>扫描角度: θ(t) = θ_max·sin(2πf_0t)</li>
+<li>Lissajous扫描模式</li>
+<li>3.3 OPA相控阵</li>
+<li>光束偏转: sin(θ) = λΔφ/(2πd)</li>
+<li>栅瓣抑制条件</li>
+<li>3.4 Flash激光雷达</li>
+<li>面阵探测器设计</li>
+<li>景深与分辨率权衡</li>
+<li>3.5 合成孔径激光雷达(SAL)</li>
+<li>方位分辨率: δ_a = λR/(2L)</li>
+<li>逆合成孔径应用</li>
+</ul>
+<h3 id="chapter-4">Chapter 4: 激光雷达制造技术</h3>
+<ul>
+<li>4.1 激光器设计</li>
+<li>脉冲能量计算: E = P_avg/f_rep</li>
+<li>峰值功率限制: P_peak = E/τ_pulse</li>
+<li>1550nm vs 905nm权衡</li>
+<li>4.2 探测器技术</li>
+<li>APD增益带宽积: GBW = M·B</li>
+<li>SPAD时间抖动: σ_SPAD = √(σ_rise² + σ_TDC²)</li>
+<li>光子探测效率PDE(λ)</li>
+<li>SiPM阵列设计</li>
+<li>4.3 光学系统</li>
+<li>准直透镜焦距: f = w_0·π/λ</li>
+<li>接收孔径与SNR: SNR ∝ D²</li>
+<li>杂散光抑制设计</li>
+</ul>
+<h3 id="chapter-5">Chapter 5: 信号处理与时序控制</h3>
+<ul>
+<li>5.1 时间数字转换(TDC)</li>
+<li>分辨率: t_LSB = T_ref/2^N</li>
+<li>游标法原理: t = n₁T₁ - n₂T₂</li>
+<li>时间内插技术</li>
+<li>5.2 波形采样与处理</li>
+<li>全波形数字化: SNR改善√N</li>
+<li>脉冲检测算法: CFD恒比定时</li>
+<li>多回波处理</li>
+<li>5.3 相位同步与时钟</li>
+<li>扫描相位延迟补偿</li>
+<li>PLL锁相环设计</li>
+<li>时钟抖动影响: σ_range = c·σ_clock/2</li>
+</ul>
+<h3 id="chapter-6">Chapter 6: 误差源分析（非信号处理）</h3>
+<ul>
+<li>6.1 机械误差</li>
+<li>振动模型: x(t) = A·sin(2πft+φ)</li>
+<li>轴承跳动: σ_bearing = f(hours, load)</li>
+<li>热膨胀补偿: ΔL = α·L·ΔT</li>
+<li>6.2 电子噪声</li>
+<li>散粒噪声: i_shot = √(2qI_DCB)</li>
+<li>热噪声: v_thermal = √(4kTRB)</li>
+<li>温度漂移模型</li>
+<li>6.3 环境因素</li>
+<li>大气衰减: τ_atm = exp(-αR)</li>
+<li>折射率修正: n = 1 + (n_s-1)·P/P_s·T_s/T</li>
+<li>降雨衰减: α_rain = aR^b (dB/km)</li>
+</ul>
+<h3 id="chapter-7">Chapter 7: 激光雷达独特优势与性能极限</h3>
+<ul>
+<li>7.1 暗场景性能</li>
+<li>最小可探测功率: P_min = NEP·√B</li>
+<li>环境光抑制比: &gt;10^6</li>
+<li>7.2 测距精度分析</li>
+<li>理论极限: σ_min = c/(2√2·π·B·SNR)</li>
+<li>实际精度: 1-3mm @ 100m</li>
+<li>7.3 材质无关性</li>
+<li>朗伯体vs镜面反射</li>
+<li>黑色物体探测能力</li>
+<li>7.4 抗干扰设计</li>
+<li>编码调制: 伪随机码</li>
+<li>时间门控</li>
+<li>偏振隔离</li>
+</ul>
+<h3 id="chapter-8">Chapter 8: 点云处理基础算法</h3>
+<ul>
+<li>8.1 坐标变换</li>
+<li>球坐标转直角: x=r·cos(θ)·cos(φ)</li>
+<li>运动补偿: P_comp = R(t)·P + T(t)</li>
+<li>8.2 滤波算法</li>
+<li>统计滤波: |p_i - μ| &gt; k·σ</li>
+<li>体素滤波: 计算复杂度O(n)</li>
+<li>双边滤波保边缘</li>
+<li>8.3 地面分割</li>
+<li>RANSAC迭代: t = log(1-p)/log(1-w^n)</li>
+<li>高程图方法</li>
+<li>坡度自适应</li>
+</ul>
+<h3 id="chapter-9">Chapter 9: 高级点云算法</h3>
+<ul>
+<li>9.1 点云配准</li>
+<li>ICP误差函数: E = Σ||R·p_i + t - q_i||²</li>
+<li>收敛条件分析</li>
+<li>NDT配准: 概率密度匹配</li>
+<li>9.2 SLAM算法</li>
+<li>扫描匹配: Hessian矩阵</li>
+<li>回环检测: 特征描述子</li>
+<li>图优化: g²o框架</li>
+<li>9.3 目标检测</li>
+<li>DBSCAN聚类: ε-邻域</li>
+<li>3D边界框拟合</li>
+<li>点云CNN架构</li>
+</ul>
+<h3 id="chapter-10">Chapter 10: 标定技术</h3>
+<ul>
+<li>10.1 内参标定</li>
+<li>测距误差模型: d_true = a·d_meas + b</li>
+<li>角度编码器校正</li>
+<li>温度补偿表</li>
+<li>10.2 外参标定</li>
+<li>手眼标定: AX = XB</li>
+<li>最小二乘解法</li>
+<li>标定不确定度</li>
+<li>10.3 在线自标定</li>
+<li>SLAM反馈校正</li>
+<li>平面特征提取</li>
+<li>标定质量指标: RMSE &lt; 2cm</li>
+</ul>
+<h3 id="chapter-11">Chapter 11: 多传感器融合算法</h3>
+<ul>
+<li>11.1 激光雷达+相机融合</li>
+<li>投影矩阵: P = K[R|t]</li>
+<li>时间同步: 曝光中心对齐</li>
+<li>特征级融合: PointPainting</li>
+<li>深度补全算法</li>
+<li>11.2 激光雷达+毫米波雷达</li>
+<li>速度信息融合: 卡尔曼滤波</li>
+<li>检测置信度融合</li>
+<li>恶劣天气互补</li>
+<li>11.3 激光雷达+IMU融合</li>
+<li>紧耦合SLAM: 误差状态卡尔曼滤波</li>
+<li>预积分理论: Δp = ∫∫(R(t)a(t)-g)dt²</li>
+<li>运动畸变校正</li>
+<li>11.4 激光雷达+GPS/RTK</li>
+<li>全局定位: 图优化框架</li>
+<li>多路径效应处理</li>
+<li>城市峡谷问题</li>
+</ul>
+<h3 id="chapter-12">Chapter 12: 自动驾驶专用章节</h3>
+<ul>
+<li>12.1 车载激光雷达特殊要求</li>
+<li>车规级标准: -40°C~85°C</li>
+<li>振动标准: ISO 16750</li>
+<li>功能安全: ASIL-B/D</li>
+<li>12.2 感知算法挑战</li>
+<li>恶劣天气: 雨雾穿透能力</li>
+<li>动态物体: 4D点云(x,y,z,v)</li>
+<li>遮挡处理: 可见性推理</li>
+<li>12.3 高精地图应用</li>
+<li>地图匹配定位: &lt;10cm精度</li>
+<li>语义地图构建</li>
+<li>众包更新策略</li>
+<li>12.4 实时性要求</li>
+<li>延迟预算: &lt;100ms端到端</li>
+<li>计算优化: GPU/FPGA加速</li>
+<li>数据带宽: ~3Gbps@128线</li>
+</ul>
+<h3 id="chapter-13">Chapter 13: 机器人应用（人形与仓储）</h3>
+<ul>
+<li>13.1 人形机器人激光雷达</li>
+<li>安装位置优化: 头部vs胸部</li>
+<li>小型化要求: &lt;200g</li>
+<li>近距离盲区: &lt;0.1m起始</li>
+<li>人机交互安全: Class 1激光</li>
+<li>步态补偿算法</li>
+<li>13.2 仓储机器人需求</li>
+<li>货架检测: 2D激光雷达足够</li>
+<li>托盘识别: 边缘提取精度</li>
+<li>窄通道导航: 180°FOV</li>
+<li>反光表面处理</li>
+<li>多机协同避障</li>
+<li>13.3 成本与功耗优化</li>
+<li>2D转3D: 旋转单线方案</li>
+<li>固态小型化: &lt;5W功耗</li>
+<li>算力需求: 边缘计算</li>
+<li>13.4 特殊算法</li>
+<li>动态障碍物预测</li>
+<li>人体姿态识别</li>
+<li>货物体积测量: ±1cm³</li>
+</ul>
+<h3 id="chapter-14">Chapter 14: 其他应用领域</h3>
+<ul>
+<li>14.1 手持扫描</li>
+<li>IMU融合: EKF/UKF</li>
+<li>累积误差控制</li>
+<li>人体工程学: &lt;1kg重量</li>
+<li>实时可视化挑战</li>
+<li>14.2 工业检测</li>
+<li>微米级精度需求</li>
+<li>标准件对比算法</li>
+<li>表面粗糙度: Sa = 1/A∬|z|dxdy</li>
+<li>缺陷分类: SVM/深度学习</li>
+<li>14.3 测绘应用</li>
+<li>误差传播: σ_total = √(σ_range² + σ_angle²·d²)</li>
+<li>坐标系统转换</li>
+<li>点云密度要求: &gt;100pts/m²</li>
+</ul>
+            </article>
+            
+            <nav class="page-nav"><a href="chapter14.html" class="nav-link prev">← Chapter 14: 其他应用领域</a></nav>
+        </main>
+    </div>
+</body>
+</html>
